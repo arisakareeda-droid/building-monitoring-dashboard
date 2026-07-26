@@ -106,20 +106,19 @@ section[data-testid="stSidebar"] .stDateInput input {
 col_logo, col_title = st.columns([1, 8])
 
 with col_logo:
-  # ป้องกันกรณีหาไฟล์รูปไม่เจอ จะแสดงไอคอนสำรองแทน
-  try:
-    st.image("Logo-Songkla-251x300.png", width=100)
-  except:
-    st.markdown("<h1>🏢</h1>", unsafe_allow_html=True)
+    try:
+        st.image("Logo-Songkla-251x300.png", width=100)
+    except:
+        st.markdown("<h1>🏢</h1>", unsafe_allow_html=True)
 
 with col_title:
-  st.markdown(
-      """
-    <div class="title-main">Building Occupancy & Activity Monitoring Dashboard</div>
-    <div class="subtitle-main">ระบบวิเคราะห์ข้อมูลการเข้า-ออกอาคารอัจฉริยะแบบเรียลไทม์ | Faculty of Engineering, Prince of Songkla University</div>
-    """,
-      unsafe_allow_html=True,
-  )
+    st.markdown(
+        """
+        <div class="title-main">Building Occupancy & Activity Monitoring Dashboard</div>
+        <div class="subtitle-main">ระบบวิเคราะห์ข้อมูลการเข้า-ออกอาคารอัจฉริยะแบบเรียลไทม์ | Faculty of Engineering, Prince of Songkla University</div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 st.markdown("<br>", unsafe_allow_html=True)
 
@@ -134,216 +133,206 @@ SHEET_URL = (
 )
 
 
-@st.cache_data(ttl=600)  # แคชข้อมูลไว้ 10 นาที เพื่อให้โหลดไวขึ้น
+@st.cache_data(ttl=600)
 def load_data():
-  df = pd.read_csv(SHEET_URL)
-  # ทำความสะอาดชื่อคอลัมน์ (ตัดช่องว่างเผื่อมี)
-  df.columns = df.columns.str.strip()
-  return df
+    df = pd.read_csv(SHEET_URL)
+    df.columns = df.columns.str.strip()
+    return df
 
 
 try:
-  df = load_data()
+    df = load_data()
 
-  # แปลงคอลัมน์ Date เป็น Datetime
-  if "Date" in df.columns:
-    df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
+    if "Date" in df.columns:
+        df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
 
-  # ==================================================
-  # SIDEBAR CONTROLS
-  # ==================================================
-  with st.sidebar:
-    try:
-      st.image("Logo-Songkla-251x300.png", width=80)
-    except:
-      pass
+    # ==================================================
+    # SIDEBAR CONTROLS
+    # ==================================================
+    with st.sidebar:
+        try:
+            st.image("Logo-Songkla-251x300.png", width=80)
+        except:
+            pass
 
-    st.markdown("### ⚙️ Dashboard Controls")
-    st.markdown("---")
+        st.markdown("### ⚙️ Dashboard Controls")
+        st.markdown("---")
 
-    # ตัวกรองช่วงวันที่
-    if "Date" in df.columns and not df["Date"].isnull().all():
-      min_date = df["Date"].min().date()
-      max_date = df["Date"].max().date()
-      date_range = st.date_input(
-          "📅 เลือกช่วงวันที่ต้องการดู", [min_date, max_date]
-      )
+        if "Date" in df.columns and not df["Date"].isnull().all():
+            min_date = df["Date"].min().date()
+            max_date = df["Date"].max().date()
+            date_range = st.date_input(
+                "📅 เลือกช่วงวันที่ต้องการดู", [min_date, max_date]
+            )
 
-      if len(date_range) == 2:
-        df = df[
-            (df["Date"] >= pd.to_datetime(date_range[0]))
-            & (df["Date"] <= pd.to_datetime(date_range[1]))
-        ]
+            if len(date_range) == 2:
+                df = df[
+                    (df["Date"] >= pd.to_datetime(date_range[0]))
+                    & (df["Date"] <= pd.to_datetime(date_range[1]))
+                ]
 
-    # ช่องค้นหาข้อมูลทั่วไป
-    search_query = st.text_input(
-        "🔍 ค้นหาข้อมูลในระบบ", placeholder="พิมพ์คำค้นหา..."
-    )
-    if search_query:
-      df = df[
-          df.astype(str)
-          .apply(lambda x: x.str.contains(search_query, case=False))
-          .any(axis=1)
-      ]
+        search_query = st.text_input(
+            "🔍 ค้นหาข้อมูลในระบบ", placeholder="พิมพ์คำค้นหา..."
+        )
+        if search_query:
+            df = df[
+                df.astype(str)
+                .apply(lambda x: x.str.contains(search_query, case=False))
+                .any(axis=1)
+            ]
 
-    st.markdown("---")
-    st.markdown(f"📊 **จำนวนข้อมูลสุทธิ:** `{len(df):,} รายการ`")
-    st.markdown("📌 **สถานะระบบ:** Connected to Google Sheets")
+        st.markdown("---")
+        st.markdown(f"📊 **จำนวนข้อมูลสุทธิ:** `{len(df):,} รายการ`")
+        st.markdown("📌 **สถานะระบบ:** Connected to Google Sheets")
 
-  # ตรวจสอบว่ามีข้อมูลหลังกรองหรือไม่
-  if df.empty:
+    if df.empty:
         st.warning("⚠️ ไม่พบข้อมูลตามเงื่อนไขที่เลือก กรุณาตรวจสอบใหม่อีกครั้ง")
         st.stop()
 
-  # ==================================================
-  # KPI METRICS SECTION
-  # ==================================================
-  total_records = len(df)
-  total_people = (
-      int(df["Person Count"].sum())
-      if "Person Count" in df.columns
-      and pd.api.types.is_numeric_dtype(df["Person Count"])
-      else 0
-  )
-  average_people = (
-      round(df["Person Count"].mean(), 2)
-      if "Person Count" in df.columns
-      and pd.api.types.is_numeric_dtype(df["Person Count"])
-      else 0
-  )
-
-  col1, col2, col3 = st.columns(3)
-
-  with col1:
-    st.metric(
-        label="📋 Total Records",
-        value=f"{total_records:,}",
-        delta="รายการทั้งหมด",
+    # ==================================================
+    # KPI METRICS SECTION
+    # ==================================================
+    total_records = len(df)
+    total_people = (
+        int(df["Person Count"].sum())
+        if "Person Count" in df.columns
+        and pd.api.types.is_numeric_dtype(df["Person Count"])
+        else 0
     )
-  with col2:
-    st.metric(
-        label="👥 Total Occupancy / Persons",
-        value=f"{total_people:,}",
-        delta="ยอดสะสมรวม",
-    )
-  with col3:
-    st.metric(
-        label="📈 Average per Entry",
-        value=f"{average_people:,}",
-        delta="ค่าเฉลี่ยต่อรอบ",
+    average_people = (
+        round(df["Person Count"].mean(), 2)
+        if "Person Count" in df.columns
+        and pd.api.types.is_numeric_dtype(df["Person Count"])
+        else 0
     )
 
-  st.markdown("<br>", unsafe_allow_html=True)
+    col1, col2, col3 = st.columns(3)
 
-  # ==================================================
-  # VISUALIZATIONS SECTION (GRAPHS)
-  # ==================================================
-  if "Date" in df.columns and "Person Count" in df.columns:
-    daily = (
-        df.groupby("Date")["Person Count"].sum().reset_index().sort_values("Date")
-    )
-
-    st.subheader("📊 แนวโน้มการเข้า-ออกอาคารรายวัน (Time Series Analysis)")
-
-    # 1. Line Chart สไตล์พรีเมียม
-    line_fig = px.line(
-        daily,
-        x="Date",
-        y="Person Count",
-        markers=True,
-        color_discrete_sequence=["#002D72"],
-        labels={"Date": "วันที่", "Person Count": "จำนวนผู้อยู่อาศัย (คน)"},
-    )
-    line_fig.update_traces(
-        line=dict(width=3), marker=dict(size=8, color="#D4AF37")
-    )
-    line_fig.update_layout(
-        plot_bgcolor="rgba(0,0,0,0)",
-        paper_bgcolor="rgba(0,0,0,0)",
-        xaxis=dict(showgrid=True, gridcolor="#f1f5f9"),
-        yaxis=dict(showgrid=True, gridcolor="#f1f5f9"),
-        margin=dict(t=20, b=20, l=20, r=20),
-        height=400,
-    )
-    st.plotly_chart(line_fig, use_container_width=True)
+    with col1:
+        st.metric(
+            label="📋 Total Records",
+            value=f"{total_records:,}",
+            delta="รายการทั้งหมด",
+        )
+    with col2:
+        st.metric(
+            label="👥 Total Occupancy / Persons",
+            value=f"{total_people:,}",
+            delta="ยอดสะสมรวม",
+        )
+    with col3:
+        st.metric(
+            label="📈 Average per Entry",
+            value=f"{average_people:,}",
+            delta="ค่าเฉลี่ยต่อรอบ",
+        )
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    # 2. กราฟย่อย 2 คอลัมน์ (Bar Chart & Area Chart)
-    col_a, col_b = st.columns(2)
+    # ==================================================
+    # VISUALIZATIONS SECTION (GRAPHS)
+    # ==================================================
+    if "Date" in df.columns and "Person Count" in df.columns:
+        daily = (
+            df.groupby("Date")["Person Count"].sum().reset_index().sort_values("Date")
+        )
 
-    with col_a:
-      st.markdown("##### 📉 สัดส่วนการใช้งานรายวัน (Bar Distribution)")
-      bar_fig = px.bar(
-          daily,
-          x="Date",
-          y="Person Count",
-          color="Person Count",
-          color_continuous_scale="Blues",
-          labels={"Date": "วันที่", "Person Count": "จำนวนคน"},
-      )
-      bar_fig.update_layout(
-          plot_bgcolor="rgba(0,0,0,0)",
-          paper_bgcolor="rgba(0,0,0,0)",
-          margin=dict(t=20, b=20, l=20, r=20),
-          height=350,
-          coloraxis_showscale=False,
-      )
-      st.plotly_chart(bar_fig, use_container_width=True)
+        st.subheader("📊 แนวโน้มการเข้า-ออกอาคารรายวัน (Time Series Analysis)")
 
-    with col_b:
-      st.markdown("##### 🌊 ความหนาแน่นสะสม (Cumulative Area Trend)")
-      area_fig = px.area(
-          daily,
-          x="Date",
-          y="Person Count",
-          color_discrete_sequence=["#004b99"],
-          labels={"Date": "วันที่", "Person Count": "จำนวนคน"},
-      )
-      area_fig.update_layout(
-          plot_bgcolor="rgba(0,0,0,0)",
-          paper_bgcolor="rgba(0,0,0,0)",
-          margin=dict(t=20, b=20, l=20, r=20),
-          height=350,
-      )
-      st.plotly_chart(area_fig, use_container_width=True)
+        line_fig = px.line(
+            daily,
+            x="Date",
+            y="Person Count",
+            markers=True,
+            color_discrete_sequence=["#002D72"],
+            labels={"Date": "วันที่", "Person Count": "จำนวนผู้อยู่อาศัย (คน)"},
+        )
+        line_fig.update_traces(
+            line=dict(width=3), marker=dict(size=8, color="#D4AF37")
+        )
+        line_fig.update_layout(
+            plot_bgcolor="rgba(0,0,0,0)",
+            paper_bgcolor="rgba(0,0,0,0)",
+            xaxis=dict(showgrid=True, gridcolor="#f1f5f9"),
+            yaxis=dict(showgrid=True, gridcolor="#f1f5f9"),
+            margin=dict(t=20, b=20, l=20, r=20),
+            height=400,
+        )
+        st.plotly_chart(line_fig, use_container_width=True)
 
-  # ==================================================
-  # DATA TABLE & EXPORT SECTION
-  # ==================================================
-  st.markdown("<br>", unsafe_allow_html=True)
-  st.subheader("📂 รายละเอียดข้อมูลดิบ (Raw Data Table)")
+        st.markdown("<br>", unsafe_allow_html=True)
 
-  with st.expander("🔍 คลิกเพื่อดูหรือซ่อนตารางข้อมูลทั้งหมด", expanded=True):
-    st.dataframe(df, use_container_width=True, height=400)
+        col_a, col_b = st.columns(2)
 
-  # ปุ่มดาวน์โหลด CSV
-  csv_data = df.to_csv(index=False).encode("utf-8-sig")  # encode utf-8-sig รองรับภาษาไทยใน Excel
-  st.download_button(
-      label="📥 ดาวน์โหลดรายงานฉบับเต็ม (.CSV)",
-      data=csv_data,
-      file_name="Building_Monitoring_Report.csv",
-      mime="text/csv",
-  )
+        with col_a:
+            st.markdown("##### 📉 สัดส่วนการใช้งานรายวัน (Bar Distribution)")
+            bar_fig = px.bar(
+                daily,
+                x="Date",
+                y="Person Count",
+                color="Person Count",
+                color_continuous_scale="Blues",
+                labels={"Date": "วันที่", "Person Count": "จำนวนคน"},
+            )
+            bar_fig.update_layout(
+                plot_bgcolor="rgba(0,0,0,0)",
+                paper_bgcolor="rgba(0,0,0,0)",
+                margin=dict(t=20, b=20, l=20, r=20),
+                height=350,
+                coloraxis_showscale=False,
+            )
+            st.plotly_chart(bar_fig, use_container_width=True)
 
-  # ==================================================
-  # FOOTER SECTION
-  # ==================================================
-  st.markdown(
-      """
-    <div class="footer-card">
-        <b>Building Monitoring & Analytics Dashboard</b><br>
-        Prince of Songkla University | Faculty of Engineering<br>
-        <span style="color: #64748b; font-size: 14px;">Academic Project 2026 • Developed with Streamlit & Python</span>
-    </div>
-    """,
-      unsafe_allow_html=True,
-  )
+        with col_b:
+            st.markdown("##### 🌊 ความหนาแน่นสะสม (Cumulative Area Trend)")
+            area_fig = px.area(
+                daily,
+                x="Date",
+                y="Person Count",
+                color_discrete_sequence=["#004b99"],
+                labels={"Date": "วันที่", "Person Count": "จำนวนคน"},
+            )
+            area_fig.update_layout(
+                plot_bgcolor="rgba(0,0,0,0)",
+                paper_bgcolor="rgba(0,0,0,0)",
+                margin=dict(t=20, b=20, l=20, r=20),
+                height=350,
+            )
+            st.plotly_chart(area_fig, use_container_width=True)
+
+    # ==================================================
+    # DATA TABLE & EXPORT SECTION
+    # ==================================================
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.subheader("📂 รายละเอียดข้อมูลดิบ (Raw Data Table)")
+
+    with st.expander("🔍 คลิกเพื่อดูหรือซ่อนตารางข้อมูลทั้งหมด", expanded=True):
+        st.dataframe(df, use_container_width=True, height=400)
+
+    csv_data = df.to_csv(index=False).encode("utf-8-sig")
+    st.download_button(
+        label="📥 ดาวน์โหลดรายงานฉบับเต็ม (.CSV)",
+        data=csv_data,
+        file_name="Building_Monitoring_Report.csv",
+        mime="text/csv",
+    )
+
+    # ==================================================
+    # FOOTER SECTION
+    # ==================================================
+    st.markdown(
+        """
+        <div class="footer-card">
+            <b>Building Monitoring & Analytics Dashboard</b><br>
+            Prince of Songkla University | Faculty of Engineering<br>
+            <span style="color: #64748b; font-size: 14px;">Academic Project 2026 • Developed with Streamlit & Python</span>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 except Exception as e:
-  st.error(f"⚠️ เกิดข้อผิดพลาดในการโหลดหรือประมวลผลข้อมูล: {e}")
-  st.info(
-      "คำแนะนำ: กรุณาตรวจสอบว่าลิงก์ Google Sheets เปิดแชร์แบบสาธารณะ (Anyone with"
-      " the link) และคอลัมน์ในชีทมีชื่อถูกต้องตามที่โปรแกรมต้องการ (เช่น Date,"
-      " Person Count)"
-  )
+    st.error(f"⚠️ เกิดข้อผิดพลาดในการโหลดหรือประมวลผลข้อมูล: {e}")
+    st.info(
+        "คำแนะนำ: กรุณาตรวจสอบว่าลิงก์ Google Sheets เปิดแชร์แบบสาธารณะ (Anyone with the link) และคอลัมน์ในชีทมีชื่อถูกต้องตามที่โปรแกรมต้องการ (เช่น Date, Person Count)"
+    )
