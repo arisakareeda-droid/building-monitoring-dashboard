@@ -107,7 +107,7 @@ col_logo, col_title = st.columns([1, 8])
 
 with col_logo:
     try:
-        st.image("Logo-Songkla-251x300.png", width=100)
+        st.image("Logo-Songkla.png", width=100)
     except:
         st.markdown("<h1>🏢</h1>", unsafe_allow_html=True)
 
@@ -151,7 +151,7 @@ try:
     # ==================================================
     with st.sidebar:
         try:
-            st.image("Logo-Songkla-251x300.png", width=80)
+            st.image("Logo-Songkla.png", width=80)
         except:
             pass
 
