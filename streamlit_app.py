@@ -13,7 +13,7 @@ st.markdown("ระบบติดตามจำนวนผู้อยู่�
 st.sidebar.header("⚙️ ตั้งค่าการเชื่อมต่อ")
 sheet_url = st.sidebar.text_input(
     "วางลิงก์ Google Sheets (แชร์แบบสาธารณะ)",
-    placeholder="https://docs.google.com/spreadsheets/d/...",
+    placeholder="https://docs.google.com/spreadsheets/d/14FJt332r41O2JvookMlfzIqljBPSJ1wdt08XnnkTl-8/edit?usp=sharing",
 )
 
 
