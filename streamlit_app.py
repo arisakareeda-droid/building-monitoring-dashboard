@@ -7,7 +7,7 @@ from datetime import datetime
 # ==================================================
 # PAGE CONFIG
 # ==================================================
-icon = Image.open("favicon.ico")
+icon = Image.open("logo.png")
 
 st.set_page_config(
     page_title="Building Monitoring & Analytics Dashboard",
