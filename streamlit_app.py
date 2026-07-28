@@ -1,76 +1,505 @@
 import pandas as pd
+import plotly.express as px
 import streamlit as st
+from datetime import datetime
+from pathlib import Path
+from PIL import Image
+
+# ==================================================
+# PAGE CONFIG
+# ==================================================
+# page_icon รับได้ทั้ง emoji, path string, URL หรือ PIL.Image
+# ส่งเป็น PIL.Image จะเสถียรกว่าการส่ง path ตรงๆ โดยเฉพาะตอน deploy
+# บน Streamlit Cloud ที่ working directory ตอนรันอาจไม่ตรงกับตอน dev บนเครื่อง
+_LOGO_PATH = Path(__file__).parent / "logo.png"
+_favicon = Image.open(_LOGO_PATH) if _LOGO_PATH.exists() else "🏢"
 
 st.set_page_config(
-    page_title="Real-Time Building Occupancy Monitoring and Alert System",
-    page_icon="🏢",
+    page_title="Building Monitoring & Analytics Dashboard",
+    page_icon=_favicon,
     layout="wide",
 )
 
-st.title("🏢 Real-Time Building Occupancy Monitoring and Alert System")
-st.markdown("ระบบติดตามจำนวนผู้อยู่อาศัยในอาคารและการแจ้งเตือนแบบเรียลไทม์จาก Google Sheets")
-
-st.sidebar.header("⚙️ ตั้งค่าการเชื่อมต่อ")
-sheet_url = st.sidebar.text_input(
-    "วางลิงก์ Google Sheets (แชร์แบบสาธารณะ)",
-    placeholder="https://docs.google.com/spreadsheets/d/...",
+SHEET_URL = (
+    "https://docs.google.com/spreadsheets/d/"
+    "14FJt332r41O2JvookMlfzIqljBPSJ1wdt08XnnkTl-8/"
+    "export?format=csv"
 )
 
+# ==================================================
+# THEME STATE
+# ==================================================
+if "theme" not in st.session_state:
+    st.session_state.theme = "Light"
 
-def convert_sheet_url(url):
-  if not url:
-    return None
-  if "/edit" in url:
-    base_url = url.split("/edit")[0]
-    return f"{base_url}/export?format=csv"
-  return url
+THEMES = {
+    "Light": {
+        "bg": "#f4f7fb",
+        "card_bg": "rgba(255, 255, 255, 0.55)",
+        "card_border": "rgba(255, 255, 255, 0.8)",
+        "text": "#0f172a",
+        "subtitle": "#64748b",
+        "primary": "#002D72",
+        "accent": "#D4AF37",
+        "sidebar_grad": "linear-gradient(180deg, #002D72 0%, #001a41 100%)",
+        "chart_bg": "rgba(0,0,0,0)",
+        "chart_grid": "#e6ecf5",
+        "chart_font": "#0f172a",
+        "plotly_template": "plotly_white",
+        "line_color": "#002D72",
+        "marker_color": "#D4AF37",
+        "area_color": "#004b99",
+        "bar_scale": "Blues",
+        "table_bg": "white",
+        "footer_bg": "white",
+        "border": "#e2e8f0",
+    },
+    "Dark": {
+        "bg": "#0b1120",
+        "card_bg": "rgba(255, 255, 255, 0.06)",
+        "card_border": "rgba(255, 255, 255, 0.12)",
+        "text": "#e2e8f0",
+        "subtitle": "#94a3b8",
+        "primary": "#7fa8ff",
+        "accent": "#f5cf6b",
+        "sidebar_grad": "linear-gradient(180deg, #0b1120 0%, #000000 100%)",
+        "chart_bg": "rgba(0,0,0,0)",
+        "chart_grid": "#1e293b",
+        "chart_font": "#e2e8f0",
+        "plotly_template": "plotly_dark",
+        "line_color": "#7fa8ff",
+        "marker_color": "#f5cf6b",
+        "area_color": "#3b6fd6",
+        "bar_scale": "Blues",
+        "table_bg": "#111827",
+        "footer_bg": "#111827",
+        "border": "#1e293b",
+    },
+}
 
 
-if sheet_url:
-  csv_url = convert_sheet_url(sheet_url)
+def apply_theme_css(t: dict):
+    st.markdown(
+        f"""
+    <style>
+    #MainMenu {{visibility: hidden;}}
+    footer {{visibility: hidden;}}
+
+    .stApp {{
+        background-color: {t['bg']};
+        color: {t['text']};
+    }}
+
+    .title-main {{
+        font-size: 36px;
+        font-weight: 800;
+        color: {t['primary']};
+        margin-bottom: 0px;
+        letter-spacing: -0.5px;
+    }}
+
+    .subtitle-main {{
+        font-size: 16px;
+        color: {t['subtitle']};
+        font-weight: 500;
+    }}
+
+    /* Glassmorphism KPI cards */
+    .kpi-card {{
+        background: {t['card_bg']};
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border: 1px solid {t['card_border']};
+        border-radius: 18px;
+        padding: 22px 24px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+        height: 100%;
+    }}
+    .kpi-card:hover {{
+        transform: translateY(-4px);
+        box-shadow: 0 14px 28px rgba(0,0,0,0.14);
+    }}
+    .kpi-label {{
+        font-size: 14px;
+        font-weight: 600;
+        color: {t['subtitle']};
+        margin-bottom: 6px;
+    }}
+    .kpi-value {{
+        font-size: 30px;
+        font-weight: 800;
+        color: {t['text']};
+    }}
+    .kpi-delta {{
+        font-size: 12px;
+        color: {t['accent']};
+        margin-top: 4px;
+    }}
+
+    /* Chart container */
+    div[data-testid="stPlotlyChart"] {{
+        background: {t['card_bg']};
+        backdrop-filter: blur(10px);
+        padding: 18px;
+        border-radius: 18px;
+        border: 1px solid {t['card_border']};
+        box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    }}
+
+    /* Sidebar */
+    section[data-testid="stSidebar"] {{
+        background: {t['sidebar_grad']};
+        border-right: 1px solid rgba(255,255,255,0.08);
+    }}
+    section[data-testid="stSidebar"] * {{
+        color: #f1f5f9 !important;
+    }}
+    section[data-testid="stSidebar"] .stTextInput input,
+    section[data-testid="stSidebar"] .stDateInput input {{
+        background-color: rgba(255, 255, 255, 0.1);
+        color: white !important;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+    }}
+
+    /* Status badge */
+    .status-badge {{
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 14px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 600;
+    }}
+    .status-online {{
+        background: rgba(34, 197, 94, 0.15);
+        color: #22c55e;
+        border: 1px solid rgba(34, 197, 94, 0.35);
+    }}
+    .status-offline {{
+        background: rgba(239, 68, 68, 0.15);
+        color: #ef4444;
+        border: 1px solid rgba(239, 68, 68, 0.35);
+    }}
+    .status-dot {{
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: currentColor;
+        box-shadow: 0 0 6px currentColor;
+    }}
+
+    /* Footer */
+    .footer-card {{
+        text-align: center;
+        background: {t['footer_bg']};
+        padding: 22px;
+        border-radius: 18px;
+        border: 1px solid {t['border']};
+        color: {t['subtitle']};
+        margin-top: 36px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    }}
+    .footer-card b {{
+        color: {t['text']};
+    }}
+
+    /* Table container */
+    div[data-testid="stExpander"] {{
+        background: {t['table_bg']};
+        border-radius: 14px;
+        border: 1px solid {t['border']};
+    }}
+
+    @media (max-width: 768px) {{
+        .title-main {{ font-size: 26px; }}
+        .kpi-value {{ font-size: 24px; }}
+    }}
+    </style>
+    """,
+        unsafe_allow_html=True,
+    )
 
 
-  @st.cache_data(ttl=60)
-  def load_data(url):
-    return pd.read_csv(url)
+def style_chart(fig, t: dict, height=380):
+    fig.update_layout(
+        template=t["plotly_template"],
+        plot_bgcolor=t["chart_bg"],
+        paper_bgcolor=t["chart_bg"],
+        font=dict(color=t["chart_font"]),
+        xaxis=dict(showgrid=True, gridcolor=t["chart_grid"]),
+        yaxis=dict(showgrid=True, gridcolor=t["chart_grid"]),
+        margin=dict(t=20, b=20, l=20, r=20),
+        height=height,
+    )
+    return fig
 
 
-  try:
-    with st.spinner("กำลังดึงข้อมูลจาก Google Sheets..."):
-      df = load_data(csv_url)
+def kpi_card(label, value, delta):
+    return f"""
+    <div class="kpi-card">
+        <div class="kpi-label">{label}</div>
+        <div class="kpi-value">{value}</div>
+        <div class="kpi-delta">{delta}</div>
+    </div>
+    """
 
-    st.success("เชื่อมต่อและโหลดข้อมูลสำเร็จ!")
 
-    st.subheader("📋 ข้อมูลการใช้งานอาคารทั้งหมด")
-    st.dataframe(df, use_container_width=True)
+@st.cache_data(ttl=600)
+def load_data():
+    df = pd.read_csv(SHEET_URL)
+    df.columns = df.columns.str.strip()
+    return df
 
-    st.subheader("📊 สรุปภาพรวมระบบ (Overview)")
+
+# ==================================================
+# SIDEBAR
+# ==================================================
+with st.sidebar:
+    try:
+        st.image("Logo-Songkla.png", width=80)
+    except Exception:
+        pass
+
+    st.markdown("### ⚙️ Dashboard Controls")
+
+    theme_choice = st.radio(
+        "🎨 ธีมการแสดงผล",
+        options=["Light", "Dark"],
+        index=0 if st.session_state.theme == "Light" else 1,
+        horizontal=True,
+    )
+    st.session_state.theme = theme_choice
+    theme = THEMES[theme_choice]
+
+    st.markdown("---")
+
+    date_range = None
+    search_query = st.text_input(
+        "🔍 ค้นหาข้อมูลในระบบ", placeholder="พิมพ์คำค้นหา..."
+    )
+
+apply_theme_css(theme)
+
+# ==================================================
+# HEADER
+# ==================================================
+col_logo, col_title, col_status = st.columns([1, 6, 2])
+
+with col_logo:
+    try:
+        st.image("logo.png", width=90)
+    except Exception:
+        st.markdown("<h1>🏢</h1>", unsafe_allow_html=True)
+
+with col_title:
+    st.markdown(
+        """
+        <div class="title-main">Building Occupancy & Activity Monitoring Dashboard</div>
+        <div class="subtitle-main">ระบบวิเคราะห์ข้อมูลการเข้า-ออกอาคารอัจฉริยะแบบเรียลไทม์ | Faculty of Engineering, Prince of Songkla University</div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+status_placeholder = col_status.empty()
+
+st.markdown("<br>", unsafe_allow_html=True)
+
+# ==================================================
+# LOAD DATA + STATUS
+# ==================================================
+system_online = True
+try:
+    df = load_data()
+
+    with status_placeholder:
+        st.markdown(
+            f"""
+            <div class="status-badge status-online">
+                <span class="status-dot"></span> Online
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    if "Date" in df.columns:
+        df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
+
+    with st.sidebar:
+        if "Date" in df.columns and not df["Date"].isnull().all():
+            min_date = df["Date"].min().date()
+            max_date = df["Date"].max().date()
+            date_range = st.date_input(
+                "📅 เลือกช่วงวันที่ต้องการดู", [min_date, max_date]
+            )
+            if len(date_range) == 2:
+                df = df[
+                    (df["Date"] >= pd.to_datetime(date_range[0]))
+                    & (df["Date"] <= pd.to_datetime(date_range[1]))
+                ]
+
+        if search_query:
+            df = df[
+                df.astype(str)
+                .apply(lambda x: x.str.contains(search_query, case=False))
+                .any(axis=1)
+            ]
+
+        st.markdown("---")
+        st.markdown(f"📊 **จำนวนข้อมูลสุทธิ:** `{len(df):,} รายการ`")
+        st.markdown(
+            f"🕒 **อัปเดตล่าสุด:** `{datetime.now().strftime('%d/%m/%Y %H:%M:%S')}`"
+        )
+
+    if df.empty:
+        st.warning("⚠️ ไม่พบข้อมูลตามเงื่อนไขที่เลือก กรุณาตรวจสอบใหม่อีกครั้ง")
+        st.stop()
+
+    # ==================================================
+    # KPI CARDS
+    # ==================================================
+    total_records = len(df)
+    total_people = (
+        int(df["Person Count"].sum())
+        if "Person Count" in df.columns
+        and pd.api.types.is_numeric_dtype(df["Person Count"])
+        else 0
+    )
+    average_people = (
+        round(df["Person Count"].mean(), 2)
+        if "Person Count" in df.columns
+        and pd.api.types.is_numeric_dtype(df["Person Count"])
+        else 0
+    )
+
     col1, col2, col3 = st.columns(3)
     with col1:
-      st.metric("จำนวนรายการทั้งหมด", len(df))
+        st.markdown(
+            kpi_card("📋 Total Records", f"{total_records:,}", "รายการทั้งหมด"),
+            unsafe_allow_html=True,
+        )
     with col2:
-      st.metric("จำนวนพารามิเตอร์/คอลัมน์", len(df.columns))
+        st.markdown(
+            kpi_card(
+                "👥 Total Occupancy / Persons", f"{total_people:,}", "ยอดสะสมรวม"
+            ),
+            unsafe_allow_html=True,
+        )
     with col3:
-      st.metric("สถานะระบบ", "Online / Active 🟢")
+        st.markdown(
+            kpi_card(
+                "📈 Average per Entry", f"{average_people:,}", "ค่าเฉลี่ยต่อรอบ"
+            ),
+            unsafe_allow_html=True,
+        )
 
-    numeric_cols = df.select_dtypes(
-        include=["float64", "int64"]
-    ).columns.tolist()
-    if numeric_cols:
-      st.subheader("📈 แผนภูมิแสดงแนวโน้มอัตราการเข้าใช้งาน")
-      selected_col = st.selectbox(
-          "เลือกตัวแปรที่ต้องการวิเคราะห์กราฟ", numeric_cols
-      )
-      st.line_chart(df[selected_col])
-    else:
-      st.info("ไม่พบคอลัมน์ที่เป็นตัวเลขสำหรับสร้างกราฟวิเคราะห์อัตโนมัติ")
+    st.markdown("<br>", unsafe_allow_html=True)
 
-  except Exception as e:
-    st.error(f"เกิดข้อผิดพลาดในการโหลดข้อมูล: {e}")
-    st.info(
-        "💡 คำแนะนำ: ตรวจสอบลิงก์ Google Sheets และตั้งค่าการแชร์เป็น 'ทุกคนที่มีลิงก์สามารถดูได้'"
+    # ==================================================
+    # CHARTS
+    # ==================================================
+    if "Date" in df.columns and "Person Count" in df.columns:
+        daily = (
+            df.groupby("Date")["Person Count"].sum().reset_index().sort_values("Date")
+        )
+
+        st.subheader("📊 แนวโน้มการเข้า-ออกอาคารรายวัน (Time Series Analysis)")
+
+        line_fig = px.line(
+            daily,
+            x="Date",
+            y="Person Count",
+            markers=True,
+            color_discrete_sequence=[theme["line_color"]],
+            labels={"Date": "วันที่", "Person Count": "จำนวนผู้อยู่อาศัย (คน)"},
+        )
+        line_fig.update_traces(
+            line=dict(width=3), marker=dict(size=8, color=theme["marker_color"])
+        )
+        st.plotly_chart(style_chart(line_fig, theme, 400), use_container_width=True)
+
+        st.markdown("<br>", unsafe_allow_html=True)
+
+        col_a, col_b = st.columns(2)
+
+        with col_a:
+            st.markdown("##### 📉 สัดส่วนการใช้งานรายวัน (Bar Distribution)")
+            bar_fig = px.bar(
+                daily,
+                x="Date",
+                y="Person Count",
+                color="Person Count",
+                color_continuous_scale=theme["bar_scale"],
+                labels={"Date": "วันที่", "Person Count": "จำนวนคน"},
+            )
+            bar_fig.update_layout(coloraxis_showscale=False)
+            st.plotly_chart(
+                style_chart(bar_fig, theme, 350), use_container_width=True
+            )
+
+        with col_b:
+            st.markdown("##### 🌊 ความหนาแน่นสะสม (Cumulative Area Trend)")
+            area_fig = px.area(
+                daily,
+                x="Date",
+                y="Person Count",
+                color_discrete_sequence=[theme["area_color"]],
+                labels={"Date": "วันที่", "Person Count": "จำนวนคน"},
+            )
+            st.plotly_chart(
+                style_chart(area_fig, theme, 350), use_container_width=True
+            )
+
+    # ==================================================
+    # DATA TABLE & EXPORT
+    # ==================================================
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.subheader("📂 รายละเอียดข้อมูลดิบ (Raw Data Table)")
+
+    with st.expander("🔍 คลิกเพื่อดูหรือซ่อนตารางข้อมูลทั้งหมด", expanded=True):
+        st.dataframe(df, use_container_width=True, height=400)
+
+    csv_data = df.to_csv(index=False).encode("utf-8-sig")
+    st.download_button(
+        label="📥 ดาวน์โหลดรายงานฉบับเต็ม (.CSV)",
+        data=csv_data,
+        file_name="Building_Monitoring_Report.csv",
+        mime="text/csv",
     )
-else:
-  st.info(
-      "👈 กรุณาวางลิงก์ Google Sheets ของคุณที่แถบด้านซ้ายมือเพื่อเริ่มใช้งานระบบ"
-  )
+
+    # ==================================================
+    # FOOTER
+    # ==================================================
+    st.markdown(
+        f"""
+        <div class="footer-card">
+            <b>Building Monitoring & Analytics Dashboard</b><br>
+            Prince of Songkla University · Faculty of Engineering<br>
+            <span style="font-size: 13px;">
+                Academic Project 2026 • Developed with Streamlit & Python •
+                Theme: {theme_choice}
+            </span>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+except Exception as e:
+    system_online = False
+    with status_placeholder:
+        st.markdown(
+            f"""
+            <div class="status-badge status-offline">
+                <span class="status-dot"></span> Offline
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    st.error(f"⚠️ เกิดข้อผิดพลาดในการโหลดหรือประมวลผลข้อมูล: {e}")
+    st.info(
+        "คำแนะนำ: กรุณาตรวจสอบว่าลิงก์ Google Sheets เปิดแชร์แบบสาธารณะ "
+        "(Anyone with the link) และคอลัมน์ในชีทมีชื่อถูกต้องตามที่โปรแกรมต้องการ "
+        "(เช่น Date, Person Count)"
+    )
