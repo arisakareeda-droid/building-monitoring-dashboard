@@ -4,6 +4,24 @@ import streamlit as st
 from datetime import datetime
 from pathlib import Path
 from PIL import Image
+import base64
+
+
+def circular_logo_html(path: str, size: int = 90):
+    """สร้าง <img> tag แบบวงกลม (ใช้แทน st.image เพื่อเซ็ต border-radius ได้)"""
+    p = Path(path)
+    if not p.exists():
+        return None
+    b64 = base64.b64encode(p.read_bytes()).decode()
+    ext = p.suffix.lstrip(".").lower()
+    mime = "jpeg" if ext == "jpg" else ext
+    return f"""
+    <img src="data:image/{mime};base64,{b64}"
+         style="width:{size}px; height:{size}px; border-radius:50%;
+                object-fit:cover; display:block;
+                border:2px solid rgba(255,255,255,0.35);
+                box-shadow:0 4px 10px rgba(0,0,0,0.15);">
+    """
 
 # ==================================================
 # PAGE CONFIG
@@ -258,10 +276,9 @@ def load_data():
 # SIDEBAR
 # ==================================================
 with st.sidebar:
-    try:
-        st.image("Logo-Songkla.png", width=80)
-    except Exception:
-        pass
+    _sidebar_logo = circular_logo_html("Logo-Songkla.png", size=80)
+    if _sidebar_logo:
+        st.markdown(_sidebar_logo, unsafe_allow_html=True)
 
     st.markdown("### ⚙️ Dashboard Controls")
 
@@ -289,9 +306,10 @@ apply_theme_css(theme)
 col_logo, col_title, col_status = st.columns([1, 6, 2])
 
 with col_logo:
-    try:
-        st.image("logo.png", width=90)
-    except Exception:
+    _header_logo = circular_logo_html("logo.png", size=90)
+    if _header_logo:
+        st.markdown(_header_logo, unsafe_allow_html=True)
+    else:
         st.markdown("<h1>🏢</h1>", unsafe_allow_html=True)
 
 with col_title:
