@@ -2,6 +2,7 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 from datetime import datetime
+import base64
 
 # ==================================================
 # PAGE CONFIG
@@ -11,6 +12,29 @@ st.set_page_config(
     page_icon="logo.png",   # ใช้ logo.png เป็น favicon
     layout="wide",
 )
+
+# ฟังก์ชันแปลงรูปเป็น Base64 เพื่อฝังใน HTML Head
+def set_favicon(png_path):
+    try:
+        with open(png_path, "rb") as image_file:
+            encoded = base64.b64encode(image_file.read()).decode()
+        st.markdown(
+            f"""
+            <script>
+                var link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+                link.type = 'image/png';
+                link.rel = 'shortcut icon';
+                link.href = 'data:image/png;base64,{encoded}';
+                document.getElementsByTagName('head')[0].appendChild(link);
+            </script>
+            """,
+            unsafe_allow_html=True
+        )
+    except Exception:
+        pass
+
+# เรียกใช้หลังจาก set_page_config
+set_favicon("logo.png")
 
 SHEET_URL = (
     "https://docs.google.com/spreadsheets/d/"
