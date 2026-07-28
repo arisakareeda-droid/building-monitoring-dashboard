@@ -1,114 +1,289 @@
 import pandas as pd
 import plotly.express as px
 import streamlit as st
+from datetime import datetime
 
-# ตั้งค่าหน้าเว็บ
+# ==================================================
+# PAGE CONFIG
+# ==================================================
 st.set_page_config(
     page_title="Building Monitoring & Analytics Dashboard",
-    page_icon="🏢",
+    page_icon="logo.png",
     layout="wide",
 )
 
-# ==================================================
-# CUSTOM CSS (ดีไซน์แบบพรีเมียม ทันสมัย โทน PSU & Engineering)
-# ==================================================
-st.markdown(
-    """
-<style>
-/* ซ่อน Menu และ Footer เริ่มต้นของ Streamlit */
-#MainMenu {visibility: hidden;}
-footer {visibility: hidden;}
-
-/* Global Styles */
-.main {
-    background-color: #f8fafc;
-}
-
-/* Header Titles */
-.title-main {
-    font-size: 38px;
-    font-weight: 800;
-    color: #002D72;
-    margin-bottom: 0px;
-    letter-spacing: -0.5px;
-}
-
-.subtitle-main {
-    font-size: 17px;
-    color: #64748b;
-    font-weight: 500;
-}
-
-/* KPI Card Customization */
-div[data-testid="metric-container"] {
-    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-    border-radius: 16px;
-    padding: 20px 24px;
-    border: 1px solid #e2e8f0;
-    border-top: 5px solid #002D72;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-    transition: all 0.3s ease;
-}
-
-div[data-testid="metric-container"]:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    border-top-color: #D4AF37;
-}
-
-/* Chart Container Styling */
-div[data-testid="stPlotlyChart"] {
-    background: white;
-    padding: 20px;
-    border-radius: 16px;
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-}
-
-/* Sidebar Customization */
-section[data-testid="stSidebar"] {
-    background: linear-gradient(180deg, #002D72 0%, #001a41 100%);
-    border-right: 1px solid #001a41;
-}
-
-section[data-testid="stSidebar"] * {
-    color: #f1f5f9 !important;
-}
-
-section[data-testid="stSidebar"] .stTextInput input, 
-section[data-testid="stSidebar"] .stDateInput input {
-    background-color: rgba(255, 255, 255, 0.1);
-    color: white !important;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 8px;
-}
-
-/* Footer Design */
-.footer-card {
-    text-align: center;
-    background: white;
-    padding: 24px;
-    border-radius: 16px;
-    border: 1px solid #e2e8f0;
-    color: #475569;
-    margin-top: 40px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-}
-</style>
-""",
-    unsafe_allow_html=True,
+SHEET_URL = (
+    "https://docs.google.com/spreadsheets/d/"
+    "14FJt332r41O2JvookMlfzIqljBPSJ1wdt08XnnkTl-8/"
+    "export?format=csv"
 )
 
+# ==================================================
+# THEME STATE
+# ==================================================
+if "theme" not in st.session_state:
+    st.session_state.theme = "Light"
+
+THEMES = {
+    "Light": {
+        "bg": "#f4f7fb",
+        "card_bg": "rgba(255, 255, 255, 0.55)",
+        "card_border": "rgba(255, 255, 255, 0.8)",
+        "text": "#0f172a",
+        "subtitle": "#64748b",
+        "primary": "#002D72",
+        "accent": "#D4AF37",
+        "sidebar_grad": "linear-gradient(180deg, #002D72 0%, #001a41 100%)",
+        "chart_bg": "rgba(0,0,0,0)",
+        "chart_grid": "#e6ecf5",
+        "chart_font": "#0f172a",
+        "plotly_template": "plotly_white",
+        "line_color": "#002D72",
+        "marker_color": "#D4AF37",
+        "area_color": "#004b99",
+        "bar_scale": "Blues",
+        "table_bg": "white",
+        "footer_bg": "white",
+        "border": "#e2e8f0",
+    },
+    "Dark": {
+        "bg": "#0b1120",
+        "card_bg": "rgba(255, 255, 255, 0.06)",
+        "card_border": "rgba(255, 255, 255, 0.12)",
+        "text": "#e2e8f0",
+        "subtitle": "#94a3b8",
+        "primary": "#7fa8ff",
+        "accent": "#f5cf6b",
+        "sidebar_grad": "linear-gradient(180deg, #0b1120 0%, #000000 100%)",
+        "chart_bg": "rgba(0,0,0,0)",
+        "chart_grid": "#1e293b",
+        "chart_font": "#e2e8f0",
+        "plotly_template": "plotly_dark",
+        "line_color": "#7fa8ff",
+        "marker_color": "#f5cf6b",
+        "area_color": "#3b6fd6",
+        "bar_scale": "Blues",
+        "table_bg": "#111827",
+        "footer_bg": "#111827",
+        "border": "#1e293b",
+    },
+}
+
+
+def apply_theme_css(t: dict):
+    st.markdown(
+        f"""
+    <style>
+    #MainMenu {{visibility: hidden;}}
+    footer {{visibility: hidden;}}
+
+    .stApp {{
+        background-color: {t['bg']};
+        color: {t['text']};
+    }}
+
+    .title-main {{
+        font-size: 36px;
+        font-weight: 800;
+        color: {t['primary']};
+        margin-bottom: 0px;
+        letter-spacing: -0.5px;
+    }}
+
+    .subtitle-main {{
+        font-size: 16px;
+        color: {t['subtitle']};
+        font-weight: 500;
+    }}
+
+    /* Glassmorphism KPI cards */
+    .kpi-card {{
+        background: {t['card_bg']};
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border: 1px solid {t['card_border']};
+        border-radius: 18px;
+        padding: 22px 24px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+        height: 100%;
+    }}
+    .kpi-card:hover {{
+        transform: translateY(-4px);
+        box-shadow: 0 14px 28px rgba(0,0,0,0.14);
+    }}
+    .kpi-label {{
+        font-size: 14px;
+        font-weight: 600;
+        color: {t['subtitle']};
+        margin-bottom: 6px;
+    }}
+    .kpi-value {{
+        font-size: 30px;
+        font-weight: 800;
+        color: {t['text']};
+    }}
+    .kpi-delta {{
+        font-size: 12px;
+        color: {t['accent']};
+        margin-top: 4px;
+    }}
+
+    /* Chart container */
+    div[data-testid="stPlotlyChart"] {{
+        background: {t['card_bg']};
+        backdrop-filter: blur(10px);
+        padding: 18px;
+        border-radius: 18px;
+        border: 1px solid {t['card_border']};
+        box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    }}
+
+    /* Sidebar */
+    section[data-testid="stSidebar"] {{
+        background: {t['sidebar_grad']};
+        border-right: 1px solid rgba(255,255,255,0.08);
+    }}
+    section[data-testid="stSidebar"] * {{
+        color: #f1f5f9 !important;
+    }}
+    section[data-testid="stSidebar"] .stTextInput input,
+    section[data-testid="stSidebar"] .stDateInput input {{
+        background-color: rgba(255, 255, 255, 0.1);
+        color: white !important;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+    }}
+
+    /* Status badge */
+    .status-badge {{
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 14px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 600;
+    }}
+    .status-online {{
+        background: rgba(34, 197, 94, 0.15);
+        color: #22c55e;
+        border: 1px solid rgba(34, 197, 94, 0.35);
+    }}
+    .status-offline {{
+        background: rgba(239, 68, 68, 0.15);
+        color: #ef4444;
+        border: 1px solid rgba(239, 68, 68, 0.35);
+    }}
+    .status-dot {{
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: currentColor;
+        box-shadow: 0 0 6px currentColor;
+    }}
+
+    /* Footer */
+    .footer-card {{
+        text-align: center;
+        background: {t['footer_bg']};
+        padding: 22px;
+        border-radius: 18px;
+        border: 1px solid {t['border']};
+        color: {t['subtitle']};
+        margin-top: 36px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    }}
+    .footer-card b {{
+        color: {t['text']};
+    }}
+
+    /* Table container */
+    div[data-testid="stExpander"] {{
+        background: {t['table_bg']};
+        border-radius: 14px;
+        border: 1px solid {t['border']};
+    }}
+
+    @media (max-width: 768px) {{
+        .title-main {{ font-size: 26px; }}
+        .kpi-value {{ font-size: 24px; }}
+    }}
+    </style>
+    """,
+        unsafe_allow_html=True,
+    )
+
+
+def style_chart(fig, t: dict, height=380):
+    fig.update_layout(
+        template=t["plotly_template"],
+        plot_bgcolor=t["chart_bg"],
+        paper_bgcolor=t["chart_bg"],
+        font=dict(color=t["chart_font"]),
+        xaxis=dict(showgrid=True, gridcolor=t["chart_grid"]),
+        yaxis=dict(showgrid=True, gridcolor=t["chart_grid"]),
+        margin=dict(t=20, b=20, l=20, r=20),
+        height=height,
+    )
+    return fig
+
+
+def kpi_card(label, value, delta):
+    return f"""
+    <div class="kpi-card">
+        <div class="kpi-label">{label}</div>
+        <div class="kpi-value">{value}</div>
+        <div class="kpi-delta">{delta}</div>
+    </div>
+    """
+
+
+@st.cache_data(ttl=600)
+def load_data():
+    df = pd.read_csv(SHEET_URL)
+    df.columns = df.columns.str.strip()
+    return df
+
 
 # ==================================================
-# HEADER SECTION
+# SIDEBAR
 # ==================================================
-col_logo, col_title = st.columns([1, 8])
+with st.sidebar:
+    try:
+        st.image("Logo-Songkla.png", width=80)
+    except Exception:
+        pass
+
+    st.markdown("### ⚙️ Dashboard Controls")
+
+    theme_choice = st.radio(
+        "🎨 ธีมการแสดงผล",
+        options=["Light", "Dark"],
+        index=0 if st.session_state.theme == "Light" else 1,
+        horizontal=True,
+    )
+    st.session_state.theme = theme_choice
+    theme = THEMES[theme_choice]
+
+    st.markdown("---")
+
+    date_range = None
+    search_query = st.text_input(
+        "🔍 ค้นหาข้อมูลในระบบ", placeholder="พิมพ์คำค้นหา..."
+    )
+
+apply_theme_css(theme)
+
+# ==================================================
+# HEADER
+# ==================================================
+col_logo, col_title, col_status = st.columns([1, 6, 2])
 
 with col_logo:
     try:
-        st.image("Logo-Songkla.png", width=100)
-    except:
+        st.image("logo.png", width=90)
+    except Exception:
         st.markdown("<h1>🏢</h1>", unsafe_allow_html=True)
 
 with col_title:
@@ -120,60 +295,43 @@ with col_title:
         unsafe_allow_html=True,
     )
 
+status_placeholder = col_status.empty()
+
 st.markdown("<br>", unsafe_allow_html=True)
 
-
 # ==================================================
-# LOAD DATA (เชื่อมตรงกับ Google Sheets)
+# LOAD DATA + STATUS
 # ==================================================
-SHEET_URL = (
-    "https://docs.google.com/spreadsheets/d/"
-    "14FJt332r41O2JvookMlfzIqljBPSJ1wdt08XnnkTl-8/"
-    "export?format=csv"
-)
-
-
-@st.cache_data(ttl=600)
-def load_data():
-    df = pd.read_csv(SHEET_URL)
-    df.columns = df.columns.str.strip()
-    return df
-
-
+system_online = True
 try:
     df = load_data()
+
+    with status_placeholder:
+        st.markdown(
+            f"""
+            <div class="status-badge status-online">
+                <span class="status-dot"></span> Online
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
     if "Date" in df.columns:
         df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
 
-    # ==================================================
-    # SIDEBAR CONTROLS
-    # ==================================================
     with st.sidebar:
-        try:
-            st.image("Logo-Songkla.png", width=80)
-        except:
-            pass
-
-        st.markdown("### ⚙️ Dashboard Controls")
-        st.markdown("---")
-
         if "Date" in df.columns and not df["Date"].isnull().all():
             min_date = df["Date"].min().date()
             max_date = df["Date"].max().date()
             date_range = st.date_input(
                 "📅 เลือกช่วงวันที่ต้องการดู", [min_date, max_date]
             )
-
             if len(date_range) == 2:
                 df = df[
                     (df["Date"] >= pd.to_datetime(date_range[0]))
                     & (df["Date"] <= pd.to_datetime(date_range[1]))
                 ]
 
-        search_query = st.text_input(
-            "🔍 ค้นหาข้อมูลในระบบ", placeholder="พิมพ์คำค้นหา..."
-        )
         if search_query:
             df = df[
                 df.astype(str)
@@ -183,14 +341,16 @@ try:
 
         st.markdown("---")
         st.markdown(f"📊 **จำนวนข้อมูลสุทธิ:** `{len(df):,} รายการ`")
-        st.markdown("📌 **สถานะระบบ:** Connected to Google Sheets")
+        st.markdown(
+            f"🕒 **อัปเดตล่าสุด:** `{datetime.now().strftime('%d/%m/%Y %H:%M:%S')}`"
+        )
 
     if df.empty:
         st.warning("⚠️ ไม่พบข้อมูลตามเงื่อนไขที่เลือก กรุณาตรวจสอบใหม่อีกครั้ง")
         st.stop()
 
     # ==================================================
-    # KPI METRICS SECTION
+    # KPI CARDS
     # ==================================================
     total_records = len(df)
     total_people = (
@@ -207,30 +367,30 @@ try:
     )
 
     col1, col2, col3 = st.columns(3)
-
     with col1:
-        st.metric(
-            label="📋 Total Records",
-            value=f"{total_records:,}",
-            delta="รายการทั้งหมด",
+        st.markdown(
+            kpi_card("📋 Total Records", f"{total_records:,}", "รายการทั้งหมด"),
+            unsafe_allow_html=True,
         )
     with col2:
-        st.metric(
-            label="👥 Total Occupancy / Persons",
-            value=f"{total_people:,}",
-            delta="ยอดสะสมรวม",
+        st.markdown(
+            kpi_card(
+                "👥 Total Occupancy / Persons", f"{total_people:,}", "ยอดสะสมรวม"
+            ),
+            unsafe_allow_html=True,
         )
     with col3:
-        st.metric(
-            label="📈 Average per Entry",
-            value=f"{average_people:,}",
-            delta="ค่าเฉลี่ยต่อรอบ",
+        st.markdown(
+            kpi_card(
+                "📈 Average per Entry", f"{average_people:,}", "ค่าเฉลี่ยต่อรอบ"
+            ),
+            unsafe_allow_html=True,
         )
 
     st.markdown("<br>", unsafe_allow_html=True)
 
     # ==================================================
-    # VISUALIZATIONS SECTION (GRAPHS)
+    # CHARTS
     # ==================================================
     if "Date" in df.columns and "Person Count" in df.columns:
         daily = (
@@ -244,21 +404,13 @@ try:
             x="Date",
             y="Person Count",
             markers=True,
-            color_discrete_sequence=["#002D72"],
+            color_discrete_sequence=[theme["line_color"]],
             labels={"Date": "วันที่", "Person Count": "จำนวนผู้อยู่อาศัย (คน)"},
         )
         line_fig.update_traces(
-            line=dict(width=3), marker=dict(size=8, color="#D4AF37")
+            line=dict(width=3), marker=dict(size=8, color=theme["marker_color"])
         )
-        line_fig.update_layout(
-            plot_bgcolor="rgba(0,0,0,0)",
-            paper_bgcolor="rgba(0,0,0,0)",
-            xaxis=dict(showgrid=True, gridcolor="#f1f5f9"),
-            yaxis=dict(showgrid=True, gridcolor="#f1f5f9"),
-            margin=dict(t=20, b=20, l=20, r=20),
-            height=400,
-        )
-        st.plotly_chart(line_fig, use_container_width=True)
+        st.plotly_chart(style_chart(line_fig, theme, 400), use_container_width=True)
 
         st.markdown("<br>", unsafe_allow_html=True)
 
@@ -271,17 +423,13 @@ try:
                 x="Date",
                 y="Person Count",
                 color="Person Count",
-                color_continuous_scale="Blues",
+                color_continuous_scale=theme["bar_scale"],
                 labels={"Date": "วันที่", "Person Count": "จำนวนคน"},
             )
-            bar_fig.update_layout(
-                plot_bgcolor="rgba(0,0,0,0)",
-                paper_bgcolor="rgba(0,0,0,0)",
-                margin=dict(t=20, b=20, l=20, r=20),
-                height=350,
-                coloraxis_showscale=False,
+            bar_fig.update_layout(coloraxis_showscale=False)
+            st.plotly_chart(
+                style_chart(bar_fig, theme, 350), use_container_width=True
             )
-            st.plotly_chart(bar_fig, use_container_width=True)
 
         with col_b:
             st.markdown("##### 🌊 ความหนาแน่นสะสม (Cumulative Area Trend)")
@@ -289,19 +437,15 @@ try:
                 daily,
                 x="Date",
                 y="Person Count",
-                color_discrete_sequence=["#004b99"],
+                color_discrete_sequence=[theme["area_color"]],
                 labels={"Date": "วันที่", "Person Count": "จำนวนคน"},
             )
-            area_fig.update_layout(
-                plot_bgcolor="rgba(0,0,0,0)",
-                paper_bgcolor="rgba(0,0,0,0)",
-                margin=dict(t=20, b=20, l=20, r=20),
-                height=350,
+            st.plotly_chart(
+                style_chart(area_fig, theme, 350), use_container_width=True
             )
-            st.plotly_chart(area_fig, use_container_width=True)
 
     # ==================================================
-    # DATA TABLE & EXPORT SECTION
+    # DATA TABLE & EXPORT
     # ==================================================
     st.markdown("<br>", unsafe_allow_html=True)
     st.subheader("📂 รายละเอียดข้อมูลดิบ (Raw Data Table)")
@@ -318,21 +462,36 @@ try:
     )
 
     # ==================================================
-    # FOOTER SECTION
+    # FOOTER
     # ==================================================
     st.markdown(
-        """
+        f"""
         <div class="footer-card">
             <b>Building Monitoring & Analytics Dashboard</b><br>
-            Prince of Songkla University | Faculty of Engineering<br>
-            <span style="color: #64748b; font-size: 14px;">Academic Project 2026 • Developed with Streamlit & Python</span>
+            Prince of Songkla University · Faculty of Engineering<br>
+            <span style="font-size: 13px;">
+                Academic Project 2026 • Developed with Streamlit & Python •
+                Theme: {theme_choice}
+            </span>
         </div>
         """,
         unsafe_allow_html=True,
     )
 
 except Exception as e:
+    system_online = False
+    with status_placeholder:
+        st.markdown(
+            f"""
+            <div class="status-badge status-offline">
+                <span class="status-dot"></span> Offline
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
     st.error(f"⚠️ เกิดข้อผิดพลาดในการโหลดหรือประมวลผลข้อมูล: {e}")
     st.info(
-        "คำแนะนำ: กรุณาตรวจสอบว่าลิงก์ Google Sheets เปิดแชร์แบบสาธารณะ (Anyone with the link) และคอลัมน์ในชีทมีชื่อถูกต้องตามที่โปรแกรมต้องการ (เช่น Date, Person Count)"
+        "คำแนะนำ: กรุณาตรวจสอบว่าลิงก์ Google Sheets เปิดแชร์แบบสาธารณะ "
+        "(Anyone with the link) และคอลัมน์ในชีทมีชื่อถูกต้องตามที่โปรแกรมต้องการ "
+        "(เช่น Date, Person Count)"
     )
