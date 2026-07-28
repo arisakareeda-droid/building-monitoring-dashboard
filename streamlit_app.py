@@ -1,17 +1,14 @@
 import pandas as pd
 import plotly.express as px
 import streamlit as st
-from PIL import Image
 from datetime import datetime
 
 # ==================================================
 # PAGE CONFIG
 # ==================================================
-icon = Image.open("logo.png")
-
 st.set_page_config(
     page_title="Building Monitoring & Analytics Dashboard",
-    page_icon=icon,
+    page_icon="logo.png",   # ใช้ logo.png เป็น favicon
     layout="wide",
 )
 
