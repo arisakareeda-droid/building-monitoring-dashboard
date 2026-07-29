@@ -70,7 +70,7 @@ THEMES = {
         "marker_color": "#D4AF37",
         "area_color": "#1d4ed8",
         "bar_scale": "Blues",
-        "table_bg": "#ffffff",  # แก้ไขให้เป็นสีขาวในโหมดสว่าง
+        "table_bg": "#ffffff",
         "footer_bg": "#ffffff",
         "border": "#dbe4f0",
     },
@@ -236,14 +236,18 @@ def apply_theme_css(t: dict):
         color: {t['text']};
     }}
 
-    /* Table container & Expander fix for Light theme */
+    /* Table container & Expander fix */
     div[data-testid="stExpander"] {{
         background: {t['table_bg']};
         border-radius: 14px;
         border: 1px solid {t['border']};
     }}
-    div[data-testid="stExpander"] summary p, 
-    div[data-testid="stExpander"] summary span {{
+    
+    /* แก้ไขสีข้อความใน Expander ให้ชัดเจนทันทีไม่ต้องเอาเมาส์ชี้ */
+    div[data-testid="stExpander"] summary,
+    div[data-testid="stExpander"] summary *,
+    div[data-testid="stExpander"] details summary p, 
+    div[data-testid="stExpander"] details summary span {{
         color: {t['text']} !important;
     }}
 
