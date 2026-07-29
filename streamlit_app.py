@@ -48,49 +48,49 @@ if "theme" not in st.session_state:
 
 THEMES = {
     "Light": {
-        "bg": "#f4f7fb",
-        "card_bg": "rgba(255,255,255,0.90)"
-        "card_border": "#dbe4f0"
-        "text": "#111827",
+        "bg": "#f8fafc",
+        "card_bg": "rgba(255,255,255,0.75)",
+        "card_border": "#dbe4f0",
+        "text": "#1e293b",
         "subtitle": "#475569",
         "primary": "#002D72",
         "accent": "#D4AF37",
-        "sidebar_grad": "linear-gradient(180deg, #002D72 0%, #001a41 100%)",
+        "sidebar_grad": "linear-gradient(180deg,#002D72 0%,#001a41 100%)",
         "chart_bg": "rgba(0,0,0,0)",
-        "chart_grid": "#e6ecf5",
-        "chart_font": "#0f172a",
+        "chart_grid": "#dbe4f0",
+        "chart_font": "#1e293b",
         "plotly_template": "plotly_white",
         "line_color": "#002D72",
         "marker_color": "#D4AF37",
-        "area_color": "#004b99",
+        "area_color": "#1d4ed8",
         "bar_scale": "Blues",
-        "table_bg": "white",
-        "footer_bg": "white",
-        "border": "#e2e8f0",
+        "table_bg": "#ffffff",
+        "footer_bg": "#ffffff",
+        "border": "#dbe4f0",
     },
+
     "Dark": {
         "bg": "#0b1120",
-        "card_bg": "rgba(255, 255, 255, 0.06)",
-        "card_border": "rgba(255, 255, 255, 0.12)",
+        "card_bg": "rgba(255,255,255,0.06)",
+        "card_border": "rgba(255,255,255,0.12)",
         "text": "#e2e8f0",
         "subtitle": "#94a3b8",
         "primary": "#7fa8ff",
         "accent": "#f5cf6b",
-        "sidebar_grad": "linear-gradient(180deg, #0b1120 0%, #000000 100%)",
+        "sidebar_grad": "linear-gradient(180deg,#0b1120 0%,#000000 100%)",
         "chart_bg": "rgba(0,0,0,0)",
         "chart_grid": "#1e293b",
         "chart_font": "#e2e8f0",
         "plotly_template": "plotly_dark",
         "line_color": "#7fa8ff",
         "marker_color": "#f5cf6b",
-        "area_color": "#3b6fd6",
+        "area_color": "#3b82f6",
         "bar_scale": "Blues",
         "table_bg": "#111827",
         "footer_bg": "#111827",
         "border": "#1e293b",
     },
 }
-
 
 def apply_theme_css(t: dict):
     components.html("""
