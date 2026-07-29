@@ -295,10 +295,10 @@ def apply_theme_css(t: dict):
         font-family:'Kanit',sans-serif !important;
     }}
 
-    /* ซ่อนปุ่มพับ Sidebar และข้อความไอคอนทั้งหมด */
-        button[data-testid="baseButton-header"],
-        [data-testid="collapsedControl"],
-        header[data-testid="stHeader"] {{
+    //* ซ่อนปุ่มพับ Sidebar และตัวหนังสือไอคอนที่ค้างอยู่ */
+    button[kind="header"], 
+    [data-testid="collapsedControl"], 
+    [data-testid="stHeader"] {{
         display: none !important;
     }}
 
