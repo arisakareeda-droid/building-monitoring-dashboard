@@ -1,15 +1,17 @@
+from datetime import datetime
+from pathlib import Path
 import pandas as pd
 import plotly.express as px
-import streamlit as st
-from datetime import datetime
-import streamlit.components.v1 as components
-from pathlib import Path
 from PIL import Image, ImageDraw, ImageOps
+import streamlit as st
+import streamlit.components.v1 as components
 
 
 def make_circular_favicon(path: str, size: int = 256):
     """ครอปรูปให้เป็นวงกลมโปร่งใส ใช้เฉพาะสำหรับ favicon เท่านั้น
-    (ไม่กระทบโลโก้ที่แสดงในหน้าเว็บ)"""
+
+    (ไม่กระทบโลโก้ที่แสดงในหน้าเว็บ)
+    """
     p = Path(path)
     if not p.exists():
         return None
@@ -21,12 +23,16 @@ def make_circular_favicon(path: str, size: int = 256):
     img.putalpha(mask)
     return img
 
+
 # ==================================================
 # PAGE CONFIG
 # ==================================================
-# favicon ครอปเป็นวงกลมโดยเฉพาะ จากไฟล์ favicon.png (คนละไฟล์กับโลโก้ในหน้าเว็บ)
 _FAVICON_PATH = Path(__file__).parent / "favicon.png"
-_favicon = make_circular_favicon(str(_FAVICON_PATH)) if _FAVICON_PATH.exists() else "🏢"
+_favicon = (
+    make_circular_favicon(str(_FAVICON_PATH))
+    if _FAVICON_PATH.exists()
+    else "🏢"
+)
 
 st.set_page_config(
     page_title="Building Monitoring & Analytics Dashboard",
@@ -68,7 +74,6 @@ THEMES = {
         "footer_bg": "#ffffff",
         "border": "#dbe4f0",
     },
-
     "Dark": {
         "bg": "#0b1120",
         "card_bg": "rgba(255,255,255,0.06)",
@@ -92,40 +97,44 @@ THEMES = {
     },
 }
 
+
 def apply_theme_css(t: dict):
-    components.html("""
+    components.html(
+        """
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    """, height=0)
-    
+    """,
+        height=0,
+    )
+
     st.markdown(
         f"""
     <style>
     #MainMenu {{visibility: hidden;}}
     footer {{visibility: hidden;}}
 
-    html, body, [class*="css"] {
+    html, body, [class*="css"] {{
     font-family: 'Kanit', sans-serif !important;
-    }
+    }}
 
     .stApp {{
         background-color: {t['bg']};
         color: {t['text']};
     }}
 
-    .title-main{
+    .title-main{{
         font-size:38px;
         font-weight:700;
         color:{t['primary']};
         line-height:1.2;
-    }
+    }}
 
-    .subtitle-main{
+    .subtitle-main{{
         font-size:17px;
         color:{t['subtitle']};
         font-weight:500;
-    }
+    }}
 
     /* Glassmorphism KPI cards */
     .kpi-card {{
@@ -156,10 +165,9 @@ def apply_theme_css(t: dict):
         color: {t['primary']};
     }}
     .kpi-delta {{
-        olor: {t['accent']};
+        color: {t['accent']};
         font-weight:600;
-    }
-    }
+    }}
 
     /* Chart container */
     div[data-testid="stPlotlyChart"] {{
@@ -240,29 +248,29 @@ def apply_theme_css(t: dict):
         .kpi-value {{ font-size: 24px; }}
     }}
 
-    h1,h2,h3,h4,h5,h6{
+    h1,h2,h3,h4,h5,h6{{
     color:{t['text']} !important;
-    }
+    }}
 
-    label,p,span,div{
+    label,p,span,div{{
         color:{t['text']};
-    }
+    }}
 
-    .stMarkdown{
+    .stMarkdown{{
         color:{t['text']};
-    }
+    }}
 
-    .stDataFrame{
+    .stDataFrame{{
         color:{t['text']};
-    }
+    }}
 
-    .stDownloadButton button{
+    .stDownloadButton button{{
         font-family:'Kanit',sans-serif;
-    }
+    }}
 
-    .stButton button{
+    .stButton button{{
         font-family:'Kanit',sans-serif;
-    }
+    }}
 
     </style>
     """,
@@ -449,7 +457,10 @@ try:
     # ==================================================
     if "Date" in df.columns and "Person Count" in df.columns:
         daily = (
-            df.groupby("Date")["Person Count"].sum().reset_index().sort_values("Date")
+            df.groupby("Date")["Person Count"]
+            .sum()
+            .reset_index()
+            .sort_values("Date")
         )
 
         st.subheader("📊 แนวโน้มการเข้า-ออกอาคารรายวัน (Time Series Analysis)")
@@ -465,7 +476,9 @@ try:
         line_fig.update_traces(
             line=dict(width=3), marker=dict(size=8, color=theme["marker_color"])
         )
-        st.plotly_chart(style_chart(line_fig, theme, 400), use_container_width=True)
+        st.plotly_chart(
+            style_chart(line_fig, theme, 400), use_container_width=True
+        )
 
         st.markdown("<br>", unsafe_allow_html=True)
 
