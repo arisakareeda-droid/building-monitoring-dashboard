@@ -238,18 +238,25 @@ def apply_theme_css(t: dict):
         color: {t['text']};
     }}
 
-    /* Expander fix */
-    div[data-testid="stExpander"] {{
+    /* Expander fix แก้ไขสีตัวหนังสือและพื้นหลังให้ชัดเจน */
+    div[data-testid="stExpander"] {
         background: {t['expander_bg']};
         border-radius: 14px;
         border: 1px solid {t['border']};
-    }}
+    }
     
     div[data-testid="stExpander"] summary,
-    div[data-testid="stExpander"] summary * {{
+    div[data-testid="stExpander"] summary * {
         color: {t['text']} !important;
         fill: {t['text']} !important;
-    }}
+    }
+
+    /* บังคับสีข้อความภายใน expander ไม่ให้โดนทับด้วยสีมืด */
+    div[data-testid="stExpander"] [data-testid="stMarkdownContainer"] p,
+    div[data-testid="stExpander"] span,
+    div[data-testid="stExpander"] label {
+        color: {t['text']} !important;
+    }
 
     @media (max-width: 768px) {{
         .title-main {{ font-size: 26px; }}
