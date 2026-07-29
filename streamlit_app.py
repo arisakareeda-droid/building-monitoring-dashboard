@@ -299,11 +299,11 @@ apply_theme_css(theme)
 # ==================================================
 # HEADER
 # ==================================================
-col_logo, col_title, col_status = st.columns([1, 6, 2])
+col_logo, col_title, col_status = st.columns([1.2, 5.8, 2])
 
 with col_logo:
     try:
-        st.image("logo_proj.png", width=130)
+        st.image("logo_proj.png", width=150)
     except Exception:
         st.markdown("<h1>🏢</h1>", unsafe_allow_html=True)
 
