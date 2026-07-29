@@ -138,21 +138,6 @@ def apply_theme_css(t: dict):
         font-weight:500;
     }}
 
-    /* Component Architecture Badge (EfferdDashboard2 Style) */
-    .component-badge {{
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        background: rgba(0, 45, 114, 0.1);
-        color: {t['primary']};
-        padding: 4px 12px;
-        border-radius: 6px;
-        font-size: 12px;
-        font-weight: 600;
-        border: 1px solid {t['card_border']};
-        margin-bottom: 8px;
-    }}
-
     /* Glassmorphism KPI cards */
     .kpi-card {{
         background: {t['card_bg']};
@@ -247,8 +232,6 @@ def apply_theme_css(t: dict):
         background:{t['footer_bg']};
         color:{t['text']};
         border:1px solid {t['border']};
-        padding: 15px;
-        border-radius: 14px;
         }}
 
     .footer-card b {{
@@ -353,7 +336,6 @@ with st.sidebar:
         pass
 
     st.markdown("### ⚙️ Dashboard Controls")
-    st.markdown('<div class="component-badge">📦 Component: AppShell</div>', unsafe_allow_html=True)
 
     theme_choice = st.radio(
         "🎨 ธีมการแสดงผล",
@@ -387,7 +369,6 @@ with col_logo:
 with col_title:
     st.markdown(
         """
-        <div class="component-badge">🚀 Component: EfferdDashboard2 / Dashboard</div>
         <div class="title-main">Building Occupancy & Activity Monitoring Dashboard</div>
         <div class="subtitle-main">ระบบวิเคราะห์ข้อมูลการเข้า-ออกอาคารอัจฉริยะแบบเรียลไทม์ | Faculty of Engineering, Prince of Songkla University</div>
         """,
@@ -599,3 +580,4 @@ except Exception as e:
         "(Anyone with the link) และคอลัมน์ในชีทมีชื่อถูกต้องตามที่โปรแกรมต้องการ "
         "(เช่น Date, Person Count)"
     )
+    
