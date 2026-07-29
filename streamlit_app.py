@@ -7,7 +7,8 @@ from PIL import Image, ImageDraw, ImageOps
 
 
 def make_circular_favicon(path: str, size: int = 256):
-    """ครอปรูปให้เป็นวงกลมโปร่งใส ใช้เฉพาะสำหรับ favicon เท่านั้น"""
+    """ครอปรูปให้เป็นวงกลมโปร่งใส ใช้เฉพาะสำหรับ favicon เท่านั้น
+    (ไม่กระทบโลโก้ที่แสดงในหน้าเว็บ)"""
     p = Path(path)
     if not p.exists():
         return None
@@ -19,10 +20,10 @@ def make_circular_favicon(path: str, size: int = 256):
     img.putalpha(mask)
     return img
 
-
 # ==================================================
 # PAGE CONFIG
 # ==================================================
+# favicon ครอปเป็นวงกลมโดยเฉพาะ จากไฟล์ favicon.png (คนละไฟล์กับโลโก้ในหน้าเว็บ)
 _FAVICON_PATH = Path(__file__).parent / "favicon.png"
 _favicon = make_circular_favicon(str(_FAVICON_PATH)) if _FAVICON_PATH.exists() else "🏢"
 
@@ -38,7 +39,262 @@ SHEET_URL = (
     "export?format=csv"
 )
 
-# ... (ส่วนการตั้งค่าธีมและฟังก์ชันอื่นๆ คงเดิม) ...
+# ==================================================
+# THEME STATE
+# ==================================================
+if "theme" not in st.session_state:
+    st.session_state.theme = "Light"
+
+THEMES = {
+    "Light": {
+        "bg": "#f4f7fb",
+        "card_bg": "rgba(255, 255, 255, 0.55)",
+        "card_border": "rgba(255, 255, 255, 0.8)",
+        "text": "#0f172a",
+        "subtitle": "#64748b",
+        "primary": "#002D72",
+        "accent": "#D4AF37",
+        "sidebar_grad": "linear-gradient(180deg, #002D72 0%, #001a41 100%)",
+        "chart_bg": "rgba(0,0,0,0)",
+        "chart_grid": "#e6ecf5",
+        "chart_font": "#0f172a",
+        "plotly_template": "plotly_white",
+        "line_color": "#002D72",
+        "marker_color": "#D4AF37",
+        "area_color": "#004b99",
+        "bar_scale": "Blues",
+        "table_bg": "white",
+        "footer_bg": "white",
+        "border": "#e2e8f0",
+    },
+    "Dark": {
+        "bg": "#0b1120",
+        "card_bg": "rgba(255, 255, 255, 0.06)",
+        "card_border": "rgba(255, 255, 255, 0.12)",
+        "text": "#e2e8f0",
+        "subtitle": "#94a3b8",
+        "primary": "#7fa8ff",
+        "accent": "#f5cf6b",
+        "sidebar_grad": "linear-gradient(180deg, #0b1120 0%, #000000 100%)",
+        "chart_bg": "rgba(0,0,0,0)",
+        "chart_grid": "#1e293b",
+        "chart_font": "#e2e8f0",
+        "plotly_template": "plotly_dark",
+        "line_color": "#7fa8ff",
+        "marker_color": "#f5cf6b",
+        "area_color": "#3b6fd6",
+        "bar_scale": "Blues",
+        "table_bg": "#111827",
+        "footer_bg": "#111827",
+        "border": "#1e293b",
+    },
+}
+
+
+def apply_theme_css(t: dict):
+    st.markdown(
+        f"""
+    <style>
+    #MainMenu {{visibility: hidden;}}
+    footer {{visibility: hidden;}}
+
+    .stApp {{
+        background-color: {t['bg']};
+        color: {t['text']};
+    }}
+
+    .title-main {{
+        font-size: 36px;
+        font-weight: 800;
+        color: {t['primary']};
+        margin-bottom: 0px;
+        letter-spacing: -0.5px;
+    }}
+
+    .subtitle-main {{
+        font-size: 16px;
+        color: {t['subtitle']};
+        font-weight: 500;
+    }}
+
+    /* Glassmorphism KPI cards */
+    .kpi-card {{
+        background: {t['card_bg']};
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border: 1px solid {t['card_border']};
+        border-radius: 18px;
+        padding: 22px 24px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+        height: 100%;
+    }}
+    .kpi-card:hover {{
+        transform: translateY(-4px);
+        box-shadow: 0 14px 28px rgba(0,0,0,0.14);
+    }}
+    .kpi-label {{
+        font-size: 14px;
+        font-weight: 600;
+        color: {t['subtitle']};
+        margin-bottom: 6px;
+    }}
+    .kpi-value {{
+        font-size: 30px;
+        font-weight: 800;
+        color: {t['text']};
+    }}
+    .kpi-delta {{
+        font-size: 12px;
+        color: {t['accent']};
+        margin-top: 4px;
+    }}
+
+    /* Chart container */
+    div[data-testid="stPlotlyChart"] {{
+        background: {t['card_bg']};
+        backdrop-filter: blur(10px);
+        padding: 18px;
+        border-radius: 18px;
+        border: 1px solid {t['card_border']};
+        box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    }}
+
+    /* Sidebar */
+    section[data-testid="stSidebar"] {{
+        background: {t['sidebar_grad']};
+        border-right: 1px solid rgba(255,255,255,0.08);
+    }}
+    section[data-testid="stSidebar"] * {{
+        color: #f1f5f9 !important;
+    }}
+    section[data-testid="stSidebar"] .stTextInput input,
+    section[data-testid="stSidebar"] .stDateInput input {{
+        background-color: rgba(255, 255, 255, 0.1);
+        color: white !important;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+    }}
+
+    /* Status badge */
+    .status-badge {{
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 14px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 600;
+    }}
+    .status-online {{
+        background: rgba(34, 197, 94, 0.15);
+        color: #22c55e;
+        border: 1px solid rgba(34, 197, 94, 0.35);
+    }}
+    .status-offline {{
+        background: rgba(239, 68, 68, 0.15);
+        color: #ef4444;
+        border: 1px solid rgba(239, 68, 68, 0.35);
+    }}
+    .status-dot {{
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: currentColor;
+        box-shadow: 0 0 6px currentColor;
+    }}
+
+    /* Footer */
+    .footer-card {{
+        text-align: center;
+        background: {t['footer_bg']};
+        padding: 22px;
+        border-radius: 18px;
+        border: 1px solid {t['border']};
+        color: {t['subtitle']};
+        margin-top: 36px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    }}
+    .footer-card b {{
+        color: {t['text']};
+    }}
+
+    /* Table container */
+    div[data-testid="stExpander"] {{
+        background: {t['table_bg']};
+        border-radius: 14px;
+        border: 1px solid {t['border']};
+    }}
+
+    @media (max-width: 768px) {{
+        .title-main {{ font-size: 26px; }}
+        .kpi-value {{ font-size: 24px; }}
+    }}
+    </style>
+    """,
+        unsafe_allow_html=True,
+    )
+
+
+def style_chart(fig, t: dict, height=380):
+    fig.update_layout(
+        template=t["plotly_template"],
+        plot_bgcolor=t["chart_bg"],
+        paper_bgcolor=t["chart_bg"],
+        font=dict(color=t["chart_font"]),
+        xaxis=dict(showgrid=True, gridcolor=t["chart_grid"]),
+        yaxis=dict(showgrid=True, gridcolor=t["chart_grid"]),
+        margin=dict(t=20, b=20, l=20, r=20),
+        height=height,
+    )
+    return fig
+
+
+def kpi_card(label, value, delta):
+    return f"""
+    <div class="kpi-card">
+        <div class="kpi-label">{label}</div>
+        <div class="kpi-value">{value}</div>
+        <div class="kpi-delta">{delta}</div>
+    </div>
+    """
+
+
+@st.cache_data(ttl=600)
+def load_data():
+    df = pd.read_csv(SHEET_URL)
+    df.columns = df.columns.str.strip()
+    return df
+
+
+# ==================================================
+# SIDEBAR
+# ==================================================
+with st.sidebar:
+    try:
+        st.image("Logo-Songkla.png", width=80)
+    except Exception:
+        pass
+
+    st.markdown("### ⚙️ Dashboard Controls")
+
+    theme_choice = st.radio(
+        "🎨 ธีมการแสดงผล",
+        options=["Light", "Dark"],
+        index=0 if st.session_state.theme == "Light" else 1,
+        horizontal=True,
+    )
+    st.session_state.theme = theme_choice
+    theme = THEMES[theme_choice]
+
+    st.markdown("---")
+
+    date_range = None
+    search_query = st.text_input(
+        "🔍 ค้นหาข้อมูลในระบบ", placeholder="พิมพ์คำค้นหา..."
+    )
+
+apply_theme_css(theme)
 
 # ==================================================
 # HEADER
@@ -47,7 +303,6 @@ col_logo, col_title, col_status = st.columns([1, 6, 2])
 
 with col_logo:
     try:
-        # ใช้ไฟล์ logo_proj.jpg แสดงผลด้านซ้ายของหัวข้อหลัก
         st.image("logo_proj.jpg", width=90)
     except Exception:
         st.markdown("<h1>🏢</h1>", unsafe_allow_html=True)
