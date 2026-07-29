@@ -3,34 +3,29 @@ import plotly.express as px
 import streamlit as st
 from datetime import datetime
 from pathlib import Path
-from PIL import Image
-import base64
+from PIL import Image, ImageDraw, ImageOps
 
 
-def circular_logo_html(path: str, size: int = 90):
-    """สร้าง <img> tag แบบวงกลม (ใช้แทน st.image เพื่อเซ็ต border-radius ได้)"""
+def make_circular_favicon(path: str, size: int = 256):
+    """ครอปรูปให้เป็นวงกลมโปร่งใส ใช้เฉพาะสำหรับ favicon เท่านั้น
+    (ไม่กระทบโลโก้ที่แสดงในหน้าเว็บ)"""
     p = Path(path)
     if not p.exists():
         return None
-    b64 = base64.b64encode(p.read_bytes()).decode()
-    ext = p.suffix.lstrip(".").lower()
-    mime = "jpeg" if ext == "jpg" else ext
-    return f"""
-    <img src="data:image/{mime};base64,{b64}"
-         style="width:{size}px; height:{size}px; border-radius:50%;
-                object-fit:cover; display:block;
-                border:2px solid rgba(255,255,255,0.35);
-                box-shadow:0 4px 10px rgba(0,0,0,0.15);">
-    """
+    img = Image.open(p).convert("RGBA")
+    img = ImageOps.fit(img, (size, size), Image.LANCZOS, centering=(0.5, 0.5))
+    mask = Image.new("L", (size, size), 0)
+    draw = ImageDraw.Draw(mask)
+    draw.ellipse((0, 0, size, size), fill=255)
+    img.putalpha(mask)
+    return img
 
 # ==================================================
 # PAGE CONFIG
 # ==================================================
-# page_icon รับได้ทั้ง emoji, path string, URL หรือ PIL.Image
-# ส่งเป็น PIL.Image จะเสถียรกว่าการส่ง path ตรงๆ โดยเฉพาะตอน deploy
-# บน Streamlit Cloud ที่ working directory ตอนรันอาจไม่ตรงกับตอน dev บนเครื่อง
+# favicon ครอปเป็นวงกลมโดยเฉพาะ ไม่กระทบโลโก้ในหน้าเว็บ
 _LOGO_PATH = Path(__file__).parent / "logo.png"
-_favicon = Image.open(_LOGO_PATH) if _LOGO_PATH.exists() else "🏢"
+_favicon = make_circular_favicon(str(_LOGO_PATH)) if _LOGO_PATH.exists() else "🏢"
 
 st.set_page_config(
     page_title="Building Monitoring & Analytics Dashboard",
@@ -276,9 +271,10 @@ def load_data():
 # SIDEBAR
 # ==================================================
 with st.sidebar:
-    _sidebar_logo = circular_logo_html("Logo-Songkla.png", size=80)
-    if _sidebar_logo:
-        st.markdown(_sidebar_logo, unsafe_allow_html=True)
+    try:
+        st.image("Logo-Songkla.png", width=80)
+    except Exception:
+        pass
 
     st.markdown("### ⚙️ Dashboard Controls")
 
@@ -306,10 +302,9 @@ apply_theme_css(theme)
 col_logo, col_title, col_status = st.columns([1, 6, 2])
 
 with col_logo:
-    _header_logo = circular_logo_html("logo.png", size=90)
-    if _header_logo:
-        st.markdown(_header_logo, unsafe_allow_html=True)
-    else:
+    try:
+        st.image("logo.png", width=90)
+    except Exception:
         st.markdown("<h1>🏢</h1>", unsafe_allow_html=True)
 
 with col_title:
