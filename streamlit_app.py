@@ -236,19 +236,17 @@ def apply_theme_css(t: dict):
         color: {t['text']};
     }}
 
-    /* Table container & Expander fix */
+    /* Table container & Expander fix (ให้สีข้อความเหมือนปุ่มดาวน์โหลดและตัวหนังสือปกติ) */
     div[data-testid="stExpander"] {{
         background: {t['table_bg']};
         border-radius: 14px;
         border: 1px solid {t['border']};
     }}
     
-    /* แก้ไขสีข้อความใน Expander ให้ชัดเจนทันทีไม่ต้องเอาเมาส์ชี้ */
     div[data-testid="stExpander"] summary,
-    div[data-testid="stExpander"] summary *,
-    div[data-testid="stExpander"] details summary p, 
-    div[data-testid="stExpander"] details summary span {{
+    div[data-testid="stExpander"] summary * {{
         color: {t['text']} !important;
+        fill: {t['text']} !important;
     }}
 
     @media (max-width: 768px) {{
