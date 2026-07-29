@@ -8,7 +8,10 @@ import streamlit.components.v1 as components
 
 
 def make_circular_favicon(path: str, size: int = 256):
-    """ครอปรูปให้เป็นวงกลมโปร่งใส ใช้เฉพาะสำหรับ favicon เท่านั้น"""
+    """ครอปรูปให้เป็นวงกลมโปร่งใส ใช้เฉพาะสำหรับ favicon เท่านั้น
+
+    (ไม่กระทบโลโก้ที่แสดงในหน้าเว็บ)
+    """
     p = Path(path)
     if not p.exists():
         return None
@@ -135,7 +138,22 @@ def apply_theme_css(t: dict):
         font-weight:500;
     }}
 
-    /* Glassmorphism KPI cards with smooth hover effect */
+    /* Component Architecture Badge (EfferdDashboard2 Style) */
+    .component-badge {{
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(0, 45, 114, 0.1);
+        color: {t['primary']};
+        padding: 4px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        border: 1px solid {t['card_border']};
+        margin-bottom: 8px;
+    }}
+
+    /* Glassmorphism KPI cards */
     .kpi-card {{
         background: {t['card_bg']};
         backdrop-filter: blur(14px);
@@ -168,7 +186,7 @@ def apply_theme_css(t: dict):
         font-weight:600;
     }}
 
-    /* Chart container styling */
+    /* Chart container */
     div[data-testid="stPlotlyChart"] {{
         color:{t['text']};
         background: {t['card_bg']};
@@ -179,7 +197,7 @@ def apply_theme_css(t: dict):
         box-shadow: 0 8px 24px rgba(0,0,0,0.06);
     }}
 
-    /* Sidebar styling */
+    /* Sidebar */
     section[data-testid="stSidebar"] {{
         background: {t['sidebar_grad']};
         border-right: 1px solid rgba(255,255,255,0.08);
@@ -229,16 +247,15 @@ def apply_theme_css(t: dict):
         background:{t['footer_bg']};
         color:{t['text']};
         border:1px solid {t['border']};
-        padding: 18px;
+        padding: 15px;
         border-radius: 14px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-    }}
+        }}
 
     .footer-card b {{
         color: {t['text']};
     }}
 
-    /* Expander styling */
+    /* Expander fix */
     div[data-testid="stExpander"] {{
         background: {t['expander_bg']};
         border-radius: 14px;
@@ -263,7 +280,7 @@ def apply_theme_css(t: dict):
     }}
 
     h1,h2,h3,h4,h5,h6{{
-        color:{t['text']} !important;
+    color:{t['text']} !important;
     }}
 
     label,p,span,div{{
@@ -336,6 +353,7 @@ with st.sidebar:
         pass
 
     st.markdown("### ⚙️ Dashboard Controls")
+    st.markdown('<div class="component-badge">📦 Component: AppShell</div>', unsafe_allow_html=True)
 
     theme_choice = st.radio(
         "🎨 ธีมการแสดงผล",
@@ -369,6 +387,7 @@ with col_logo:
 with col_title:
     st.markdown(
         """
+        <div class="component-badge">🚀 Component: EfferdDashboard2 / Dashboard</div>
         <div class="title-main">Building Occupancy & Activity Monitoring Dashboard</div>
         <div class="subtitle-main">ระบบวิเคราะห์ข้อมูลการเข้า-ออกอาคารอัจฉริยะแบบเรียลไทม์ | Faculty of Engineering, Prince of Songkla University</div>
         """,
