@@ -295,6 +295,10 @@ def apply_theme_css(t: dict):
         font-family:'Kanit',sans-serif !important;
     }}
 
+    button[kind="header"] {{
+    display: none !important;
+    }}
+
     </style>
     """,
         unsafe_allow_html=True,
