@@ -295,8 +295,11 @@ def apply_theme_css(t: dict):
         font-family:'Kanit',sans-serif !important;
     }}
 
-    button[kind="header"] {{
-    display: none !important;
+    /* ซ่อนปุ่มพับ Sidebar และข้อความไอคอนทั้งหมด */
+        button[data-testid="baseButton-header"],
+        [data-testid="collapsedControl"],
+        header[data-testid="stHeader"] {{
+        display: none !important;
     }}
 
     </style>
