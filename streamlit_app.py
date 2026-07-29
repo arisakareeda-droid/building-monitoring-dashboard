@@ -70,7 +70,7 @@ THEMES = {
         "marker_color": "#D4AF37",
         "area_color": "#1d4ed8",
         "bar_scale": "Blues",
-        "expander_bg": "#f1f5f9",  # สีพื้นหลังกล่อง Expander สำหรับโหมดสว่าง (เทาอ่อน)
+        "expander_bg": "#ffffff",
         "table_bg": "#ffffff",
         "footer_bg": "#ffffff",
         "border": "#dbe4f0",
@@ -92,7 +92,7 @@ THEMES = {
         "marker_color": "#f5cf6b",
         "area_color": "#3b82f6",
         "bar_scale": "Blues",
-        "expander_bg": "#111827",  # สีพื้นหลังกล่อง Expander สำหรับโหมดมืด
+        "expander_bg": "#111827",
         "table_bg": "#111827",
         "footer_bg": "#111827",
         "border": "#1e293b",
@@ -238,25 +238,24 @@ def apply_theme_css(t: dict):
         color: {t['text']};
     }}
 
-    /* Expander fix แก้ไขสีตัวหนังสือและพื้นหลังให้ชัดเจน */
-    div[data-testid="stExpander"] {
+    /* Expander fix */
+    div[data-testid="stExpander"] {{
         background: {t['expander_bg']};
         border-radius: 14px;
         border: 1px solid {t['border']};
-    }
+    }}
     
     div[data-testid="stExpander"] summary,
-    div[data-testid="stExpander"] summary * {
+    div[data-testid="stExpander"] summary * {{
         color: {t['text']} !important;
         fill: {t['text']} !important;
-    }
+    }}
 
-    /* บังคับสีข้อความภายใน expander ไม่ให้โดนทับด้วยสีมืด */
     div[data-testid="stExpander"] [data-testid="stMarkdownContainer"] p,
     div[data-testid="stExpander"] span,
-    div[data-testid="stExpander"] label {
+    div[data-testid="stExpander"] label {{
         color: {t['text']} !important;
-    }
+    }}
 
     @media (max-width: 768px) {{
         .title-main {{ font-size: 26px; }}
