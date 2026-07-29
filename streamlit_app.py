@@ -23,9 +23,9 @@ def make_circular_favicon(path: str, size: int = 256):
 # ==================================================
 # PAGE CONFIG
 # ==================================================
-# favicon ครอปเป็นวงกลมโดยเฉพาะ ไม่กระทบโลโก้ในหน้าเว็บ
-_LOGO_PATH = Path(__file__).parent / "logo.png"
-_favicon = make_circular_favicon(str(_LOGO_PATH)) if _LOGO_PATH.exists() else "🏢"
+# favicon ครอปเป็นวงกลมโดยเฉพาะ จากไฟล์ favicon.png (คนละไฟล์กับโลโก้ในหน้าเว็บ)
+_FAVICON_PATH = Path(__file__).parent / "favicon.png"
+_favicon = make_circular_favicon(str(_FAVICON_PATH)) if _FAVICON_PATH.exists() else "🏢"
 
 st.set_page_config(
     page_title="Building Monitoring & Analytics Dashboard",
@@ -303,7 +303,7 @@ col_logo, col_title, col_status = st.columns([1, 6, 2])
 
 with col_logo:
     try:
-        st.image("logo.png", width=90)
+        st.image("logo_proj.jpg", width=90)
     except Exception:
         st.markdown("<h1>🏢</h1>", unsafe_allow_html=True)
 
