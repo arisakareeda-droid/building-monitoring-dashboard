@@ -303,7 +303,21 @@ col_logo, col_title, col_status = st.columns([1.2, 5.8, 2])
 
 with col_logo:
     try:
-        st.image("logo_proj.png", width=150)
+        # แปลงไฟล์รูปเป็น Base64 เพื่อฝังลงใน HTML 
+        import base64
+        with open("logo_proj.jpg", "rb") as image_file:
+            encoded_string = base64.b64encode(image_file.read()).decode()
+        
+        # ใช้ HTML กำหนดขนาดความกว้าง (เช่น 160px หรือปรับเพิ่มได้ตามต้องการ) และใช้ CSS ช่วยให้ภาพคมชัดขึ้น
+        st.markdown(
+            f"""
+            <div style="display: flex; align-items: center; height: 100%;">
+                <img src="data:image/jpeg;base64,{encoded_string}" 
+                     style="width: 160px; height: auto; border-radius: 50%; image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges;" />
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
     except Exception:
         st.markdown("<h1>🏢</h1>", unsafe_allow_html=True)
 
