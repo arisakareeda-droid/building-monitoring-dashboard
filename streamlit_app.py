@@ -2,6 +2,7 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 from datetime import datetime
+import streamlit.components.v1 as components
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageOps
 
@@ -48,10 +49,10 @@ if "theme" not in st.session_state:
 THEMES = {
     "Light": {
         "bg": "#f4f7fb",
-        "card_bg": "rgba(255, 255, 255, 0.55)",
-        "card_border": "rgba(255, 255, 255, 0.8)",
-        "text": "#0f172a",
-        "subtitle": "#64748b",
+        "card_bg": "rgba(255,255,255,0.90)"
+        "card_border": "#dbe4f0"
+        "text": "#111827",
+        "subtitle": "#475569",
         "primary": "#002D72",
         "accent": "#D4AF37",
         "sidebar_grad": "linear-gradient(180deg, #002D72 0%, #001a41 100%)",
@@ -92,30 +93,39 @@ THEMES = {
 
 
 def apply_theme_css(t: dict):
+    components.html("""
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    """, height=0)
+    
     st.markdown(
         f"""
     <style>
     #MainMenu {{visibility: hidden;}}
     footer {{visibility: hidden;}}
 
+    html, body, [class*="css"] {
+    font-family: 'Kanit', sans-serif !important;
+    }
+
     .stApp {{
         background-color: {t['bg']};
         color: {t['text']};
     }}
 
-    .title-main {{
-        font-size: 36px;
-        font-weight: 800;
-        color: {t['primary']};
-        margin-bottom: 0px;
-        letter-spacing: -0.5px;
-    }}
+    .title-main{
+        font-size:38px;
+        font-weight:700;
+        color:{t['primary']};
+        line-height:1.2;
+    }
 
-    .subtitle-main {{
-        font-size: 16px;
-        color: {t['subtitle']};
-        font-weight: 500;
-    }}
+    .subtitle-main{
+        font-size:17px;
+        color:{t['subtitle']};
+        font-weight:500;
+    }
 
     /* Glassmorphism KPI cards */
     .kpi-card {{
@@ -134,24 +144,26 @@ def apply_theme_css(t: dict):
         box-shadow: 0 14px 28px rgba(0,0,0,0.14);
     }}
     .kpi-label {{
-        font-size: 14px;
+        font-size: 15px;
         font-weight: 600;
-        color: {t['subtitle']};
-        margin-bottom: 6px;
+        color: {t['text']};
+        opacity: .85;
+        margin-bottom: 8px;
     }}
     .kpi-value {{
-        font-size: 30px;
-        font-weight: 800;
-        color: {t['text']};
+        font-size: 32px;
+        font-weight: 700;
+        color: {t['primary']};
     }}
     .kpi-delta {{
-        font-size: 12px;
-        color: {t['accent']};
-        margin-top: 4px;
-    }}
+        olor: {t['accent']};
+        font-weight:600;
+    }
+    }
 
     /* Chart container */
     div[data-testid="stPlotlyChart"] {{
+        color:{t['text']};
         background: {t['card_bg']};
         backdrop-filter: blur(10px);
         padding: 18px;
@@ -206,15 +218,12 @@ def apply_theme_css(t: dict):
 
     /* Footer */
     .footer-card {{
-        text-align: center;
-        background: {t['footer_bg']};
-        padding: 22px;
-        border-radius: 18px;
-        border: 1px solid {t['border']};
-        color: {t['subtitle']};
-        margin-top: 36px;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.06);
-    }}
+        text-align:center;
+        background:{t['footer_bg']};
+        color:{t['text']};
+        border:1px solid {t['border']};
+        }}
+
     .footer-card b {{
         color: {t['text']};
     }}
@@ -230,6 +239,31 @@ def apply_theme_css(t: dict):
         .title-main {{ font-size: 26px; }}
         .kpi-value {{ font-size: 24px; }}
     }}
+
+    h1,h2,h3,h4,h5,h6{
+    color:{t['text']} !important;
+    }
+
+    label,p,span,div{
+        color:{t['text']};
+    }
+
+    .stMarkdown{
+        color:{t['text']};
+    }
+
+    .stDataFrame{
+        color:{t['text']};
+    }
+
+    .stDownloadButton button{
+        font-family:'Kanit',sans-serif;
+    }
+
+    .stButton button{
+        font-family:'Kanit',sans-serif;
+    }
+
     </style>
     """,
         unsafe_allow_html=True,
