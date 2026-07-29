@@ -8,10 +8,7 @@ import streamlit.components.v1 as components
 
 
 def make_circular_favicon(path: str, size: int = 256):
-    """ครอปรูปให้เป็นวงกลมโปร่งใส ใช้เฉพาะสำหรับ favicon เท่านั้น
-
-    (ไม่กระทบโลโก้ที่แสดงในหน้าเว็บ)
-    """
+    """ครอปรูปให้เป็นวงกลมโปร่งใส ใช้เฉพาะสำหรับ favicon เท่านั้น"""
     p = Path(path)
     if not p.exists():
         return None
@@ -138,7 +135,7 @@ def apply_theme_css(t: dict):
         font-weight:500;
     }}
 
-    /* Glassmorphism KPI cards */
+    /* Glassmorphism KPI cards with smooth hover effect */
     .kpi-card {{
         background: {t['card_bg']};
         backdrop-filter: blur(14px);
@@ -171,7 +168,7 @@ def apply_theme_css(t: dict):
         font-weight:600;
     }}
 
-    /* Chart container */
+    /* Chart container styling */
     div[data-testid="stPlotlyChart"] {{
         color:{t['text']};
         background: {t['card_bg']};
@@ -182,7 +179,7 @@ def apply_theme_css(t: dict):
         box-shadow: 0 8px 24px rgba(0,0,0,0.06);
     }}
 
-    /* Sidebar */
+    /* Sidebar styling */
     section[data-testid="stSidebar"] {{
         background: {t['sidebar_grad']};
         border-right: 1px solid rgba(255,255,255,0.08);
@@ -232,13 +229,16 @@ def apply_theme_css(t: dict):
         background:{t['footer_bg']};
         color:{t['text']};
         border:1px solid {t['border']};
-        }}
+        padding: 18px;
+        border-radius: 14px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }}
 
     .footer-card b {{
         color: {t['text']};
     }}
 
-    /* Expander fix */
+    /* Expander styling */
     div[data-testid="stExpander"] {{
         background: {t['expander_bg']};
         border-radius: 14px;
@@ -263,7 +263,7 @@ def apply_theme_css(t: dict):
     }}
 
     h1,h2,h3,h4,h5,h6{{
-    color:{t['text']} !important;
+        color:{t['text']} !important;
     }}
 
     label,p,span,div{{
