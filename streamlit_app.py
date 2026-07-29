@@ -113,10 +113,13 @@ def apply_theme_css(t: dict):
     st.markdown(
         f"""
     <style>
+    /* บังคับโหลดและใช้ฟอนต์ Kanit กับทุกสมาชิกรวมถึง Shadow DOM ของ Streamlit */
+    @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap');
+
     #MainMenu {{visibility: hidden;}}
     footer {{visibility: hidden;}}
 
-    html, body, [class*="css"], * {{
+    html, body, [class*="css"], .stApp, p, span, div, label, input, button, table, th, td {{
         font-family: 'Kanit', sans-serif !important;
     }}
 
@@ -189,6 +192,7 @@ def apply_theme_css(t: dict):
     }}
     section[data-testid="stSidebar"] * {{
         color: #f1f5f9 !important;
+        font-family: 'Kanit', sans-serif !important;
     }}
     section[data-testid="stSidebar"] .stTextInput input,
     section[data-testid="stSidebar"] .stDateInput input {{
@@ -281,14 +285,14 @@ def apply_theme_css(t: dict):
     }}
 
     .stDownloadButton button{{
-        font-family:'Kanit',sans-serif;
+        font-family:'Kanit',sans-serif !important;
         background-color: {t['table_bg']} !important;
         color: {t['text']} !important;
         border: 1px solid {t['border']} !important;
     }}
 
     .stButton button{{
-        font-family:'Kanit',sans-serif;
+        font-family:'Kanit',sans-serif !important;
     }}
 
     </style>
