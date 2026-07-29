@@ -70,6 +70,7 @@ THEMES = {
         "marker_color": "#D4AF37",
         "area_color": "#1d4ed8",
         "bar_scale": "Blues",
+        "expander_bg": "#f1f5f9",  # สีพื้นหลังกล่อง Expander สำหรับโหมดสว่าง (เทาอ่อน)
         "table_bg": "#ffffff",
         "footer_bg": "#ffffff",
         "border": "#dbe4f0",
@@ -91,6 +92,7 @@ THEMES = {
         "marker_color": "#f5cf6b",
         "area_color": "#3b82f6",
         "bar_scale": "Blues",
+        "expander_bg": "#111827",  # สีพื้นหลังกล่อง Expander สำหรับโหมดมืด
         "table_bg": "#111827",
         "footer_bg": "#111827",
         "border": "#1e293b",
@@ -236,9 +238,9 @@ def apply_theme_css(t: dict):
         color: {t['text']};
     }}
 
-    /* Table container & Expander fix (ให้สีข้อความเหมือนปุ่มดาวน์โหลดและตัวหนังสือปกติ) */
+    /* Expander fix */
     div[data-testid="stExpander"] {{
-        background: {t['table_bg']};
+        background: {t['expander_bg']};
         border-radius: 14px;
         border: 1px solid {t['border']};
     }}
