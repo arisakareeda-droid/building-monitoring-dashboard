@@ -8,10 +8,7 @@ import streamlit.components.v1 as components
 
 
 def make_circular_favicon(path: str, size: int = 256):
-    """ครอปรูปให้เป็นวงกลมโปร่งใส ใช้เฉพาะสำหรับ favicon เท่านั้น
-
-    (ไม่กระทบโลโก้ที่แสดงในหน้าเว็บ)
-    """
+    """ครอปรูปให้เป็นวงกลมโปร่งใส ใช้เฉพาะสำหรับ favicon เท่านั้น"""
     p = Path(path)
     if not p.exists():
         return None
@@ -55,7 +52,7 @@ if "theme" not in st.session_state:
 THEMES = {
     "Light": {
         "bg": "#f8fafc",
-        "card_bg": "rgba(255,255,255,0.75)",
+        "card_bg": "rgba(255,255,255,0.85)",
         "card_border": "#dbe4f0",
         "text": "#1e293b",
         "subtitle": "#475569",
@@ -79,14 +76,14 @@ THEMES = {
         "bg": "#0b1120",
         "card_bg": "rgba(255,255,255,0.06)",
         "card_border": "rgba(255,255,255,0.12)",
-        "text": "#e2e8f0",
+        "text": "#f1f5f9",
         "subtitle": "#94a3b8",
         "primary": "#7fa8ff",
         "accent": "#f5cf6b",
         "sidebar_grad": "linear-gradient(180deg,#0b1120 0%,#000000 100%)",
         "chart_bg": "rgba(0,0,0,0)",
         "chart_grid": "#1e293b",
-        "chart_font": "#e2e8f0",
+        "chart_font": "#f1f5f9",
         "plotly_template": "plotly_dark",
         "line_color": "#7fa8ff",
         "marker_color": "#f5cf6b",
@@ -116,8 +113,10 @@ def apply_theme_css(t: dict):
     #MainMenu {{visibility: hidden;}}
     footer {{visibility: hidden;}}
 
+    /* Global Typography Enhancement */
     html, body, [class*="css"] {{
-    font-family: 'Kanit', sans-serif !important;
+        font-family: 'Kanit', sans-serif !important;
+        letter-spacing: 0.2px;
     }}
 
     .stApp {{
@@ -126,16 +125,18 @@ def apply_theme_css(t: dict):
     }}
 
     .title-main{{
-        font-size:38px;
-        font-weight:700;
-        color:{t['primary']};
-        line-height:1.2;
+        font-size: 36px;
+        font-weight: 700;
+        color: {t['primary']};
+        line-height: 1.3;
+        letter-spacing: -0.5px;
     }}
 
     .subtitle-main{{
-        font-size:17px;
-        color:{t['subtitle']};
-        font-weight:500;
+        font-size: 16px;
+        color: {t['subtitle']};
+        font-weight: 400;
+        margin-top: 4px;
     }}
 
     /* Glassmorphism KPI cards */
@@ -146,40 +147,43 @@ def apply_theme_css(t: dict):
         border: 1px solid {t['card_border']};
         border-radius: 18px;
         padding: 22px 24px;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.06);
         transition: transform 0.25s ease, box-shadow 0.25s ease;
         height: 100%;
     }}
     .kpi-card:hover {{
         transform: translateY(-4px);
-        box-shadow: 0 14px 28px rgba(0,0,0,0.14);
+        box-shadow: 0 14px 28px rgba(0,0,0,0.12);
     }}
     .kpi-label {{
-        font-size: 15px;
-        font-weight: 600;
-        color: {t['text']};
-        opacity: .85;
-        margin-bottom: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        color: {t['subtitle']};
+        margin-bottom: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }}
     .kpi-value {{
-        font-size: 32px;
+        font-size: 30px;
         font-weight: 700;
         color: {t['primary']};
     }}
     .kpi-delta {{
         color: {t['accent']};
-        font-weight:600;
+        font-weight: 600;
+        font-size: 13px;
+        margin-top: 4px;
     }}
 
     /* Chart container */
     div[data-testid="stPlotlyChart"] {{
-        color:{t['text']};
+        color: {t['text']};
         background: {t['card_bg']};
         backdrop-filter: blur(10px);
         padding: 18px;
         border-radius: 18px;
         border: 1px solid {t['card_border']};
-        box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.04);
     }}
 
     /* Sidebar */
@@ -189,6 +193,7 @@ def apply_theme_css(t: dict):
     }}
     section[data-testid="stSidebar"] * {{
         color: #f1f5f9 !important;
+        font-family: 'Kanit', sans-serif !important;
     }}
     section[data-testid="stSidebar"] .stTextInput input,
     section[data-testid="stSidebar"] .stDateInput input {{
@@ -206,7 +211,7 @@ def apply_theme_css(t: dict):
         padding: 6px 14px;
         border-radius: 999px;
         font-size: 13px;
-        font-weight: 600;
+        font-weight: 500;
     }}
     .status-online {{
         background: rgba(34, 197, 94, 0.15);
@@ -228,14 +233,17 @@ def apply_theme_css(t: dict):
 
     /* Footer */
     .footer-card {{
-        text-align:center;
-        background:{t['footer_bg']};
-        color:{t['text']};
-        border:1px solid {t['border']};
-        }}
-
+        text-align: center;
+        background: {t['footer_bg']};
+        color: {t['text']};
+        border: 1px solid {t['border']};
+        padding: 16px;
+        border-radius: 14px;
+        font-weight: 300;
+    }}
     .footer-card b {{
         color: {t['text']};
+        font-weight: 600;
     }}
 
     /* Expander fix */
@@ -244,13 +252,12 @@ def apply_theme_css(t: dict):
         border-radius: 14px;
         border: 1px solid {t['border']};
     }}
-    
     div[data-testid="stExpander"] summary,
     div[data-testid="stExpander"] summary * {{
         color: {t['text']} !important;
         fill: {t['text']} !important;
+        font-weight: 500;
     }}
-
     div[data-testid="stExpander"] [data-testid="stMarkdownContainer"] p,
     div[data-testid="stExpander"] span,
     div[data-testid="stExpander"] label {{
@@ -258,37 +265,40 @@ def apply_theme_css(t: dict):
     }}
 
     @media (max-width: 768px) {{
-        .title-main {{ font-size: 26px; }}
-        .kpi-value {{ font-size: 24px; }}
+        .title-main {{ font-size: 24px; }}
+        .kpi-value {{ font-size: 22px; }}
     }}
 
-    h1,h2,h3,h4,h5,h6{{
-    color:{t['text']} !important;
+    h1, h2, h3, h4, h5, h6 {{
+        color: {t['text']} !important;
+        font-weight: 600 !important;
     }}
 
-    label,p,span,div{{
-        color:{t['text']};
+    label, p, span, div {{
+        color: {t['text']};
     }}
 
-    .stMarkdown{{
-        color:{t['text']};
+    .stMarkdown {{
+        color: {t['text']};
     }}
 
-    .stDataFrame{{
-        color:{t['text']};
+    .stDataFrame {{
+        color: {t['text']};
     }}
 
-    .stDownloadButton button{{
-        font-family:'Kanit',sans-serif;
+    .stDownloadButton button {{
+        font-family: 'Kanit', sans-serif !important;
         background-color: {t['table_bg']} !important;
         color: {t['text']} !important;
         border: 1px solid {t['border']} !important;
+        font-weight: 500;
+        border-radius: 10px;
     }}
 
-    .stButton button{{
-        font-family:'Kanit',sans-serif;
+    .stButton button {{
+        font-family: 'Kanit', sans-serif !important;
+        font-weight: 500;
     }}
-
     </style>
     """,
         unsafe_allow_html=True,
@@ -300,7 +310,7 @@ def style_chart(fig, t: dict, height=380):
         template=t["plotly_template"],
         plot_bgcolor=t["chart_bg"],
         paper_bgcolor=t["chart_bg"],
-        font=dict(color=t["chart_font"]),
+        font=dict(color=t["chart_font"], family="Kanit"),
         xaxis=dict(showgrid=True, gridcolor=t["chart_grid"]),
         yaxis=dict(showgrid=True, gridcolor=t["chart_grid"]),
         margin=dict(t=20, b=20, l=20, r=20),
