@@ -70,6 +70,7 @@ THEMES = {
         "marker_color": "#D4AF37",
         "area_color": "#1d4ed8",
         "bar_scale": "Blues",
+        "expander_bg": "#ffffff",
         "table_bg": "#ffffff",
         "footer_bg": "#ffffff",
         "border": "#dbe4f0",
@@ -91,6 +92,7 @@ THEMES = {
         "marker_color": "#f5cf6b",
         "area_color": "#3b82f6",
         "bar_scale": "Blues",
+        "expander_bg": "#111827",
         "table_bg": "#111827",
         "footer_bg": "#111827",
         "border": "#1e293b",
@@ -236,11 +238,23 @@ def apply_theme_css(t: dict):
         color: {t['text']};
     }}
 
-    /* Table container */
+    /* Expander fix */
     div[data-testid="stExpander"] {{
-        background: {t['table_bg']};
+        background: {t['expander_bg']};
         border-radius: 14px;
         border: 1px solid {t['border']};
+    }}
+    
+    div[data-testid="stExpander"] summary,
+    div[data-testid="stExpander"] summary * {{
+        color: {t['text']} !important;
+        fill: {t['text']} !important;
+    }}
+
+    div[data-testid="stExpander"] [data-testid="stMarkdownContainer"] p,
+    div[data-testid="stExpander"] span,
+    div[data-testid="stExpander"] label {{
+        color: {t['text']} !important;
     }}
 
     @media (max-width: 768px) {{
@@ -266,6 +280,9 @@ def apply_theme_css(t: dict):
 
     .stDownloadButton button{{
         font-family:'Kanit',sans-serif;
+        background-color: {t['table_bg']} !important;
+        color: {t['text']} !important;
+        border: 1px solid {t['border']} !important;
     }}
 
     .stButton button{{
