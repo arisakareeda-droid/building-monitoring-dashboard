@@ -303,8 +303,7 @@ col_logo, col_title, col_status = st.columns([1, 6, 2])
 
 with col_logo:
     try:
-        # เพิ่มขนาด width เป็น 130 เพื่อให้รูปใหญ่และชัดเจนขึ้น
-        st.image("logo_proj.jpg", width=130)
+        st.image("logo_proj.png", width=90)
     except Exception:
         st.markdown("<h1>🏢</h1>", unsafe_allow_html=True)
 
