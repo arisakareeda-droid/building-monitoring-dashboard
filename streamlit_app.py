@@ -239,43 +239,23 @@ def apply_theme_css(t: dict):
     }}
 
     /* Expander fix */
-    div[data-testid="stExpander"]{
-    background:{t['expander_bg']} !important;
-    border:1px solid {t['border']} !important;
-    border-radius:14px !important;
-    }
+    div[data-testid="stExpander"] {{
+        background: {t['expander_bg']};
+        border-radius: 14px;
+        border: 1px solid {t['border']};
+    }}
     
-    div[data-testid="stExpander"] summary{
-    color:{t['text']} !important;
-    background:transparent !important;
-    }
+    div[data-testid="stExpander"] summary,
+    div[data-testid="stExpander"] summary * {{
+        color: {t['text']} !important;
+        fill: {t['text']} !important;
+    }}
 
-
-    div[data-testid="stExpander"] summary p,
-    div[data-testid="stExpander"] summary span,
-    div[data-testid="stExpander"] summary div{
-    color:{t['text']} !important;
-    opacity:1 !important;
-    font-weight:600 !important;
-    }
-
-    div[data-testid="stExpander"] summary svg{
-    fill:{t['text']} !important;
-    color:{t['text']} !important;
-    }
-
-    /* Hover */
-    div[data-testid="stExpander"] summary:hover{
-        color:{t['primary']} !important;
-    }
-
-    /* เนื้อหาด้านใน */
-    div[data-testid="stExpander"] [data-testid="stMarkdownContainer"],
-    div[data-testid="stExpander"] label,
+    div[data-testid="stExpander"] [data-testid="stMarkdownContainer"] p,
     div[data-testid="stExpander"] span,
-    div[data-testid="stExpander"] p{
-        color:{t['text']} !important;
-    }
+    div[data-testid="stExpander"] label {{
+        color: {t['text']} !important;
+    }}
 
     @media (max-width: 768px) {{
         .title-main {{ font-size: 26px; }}
@@ -555,10 +535,7 @@ try:
     st.markdown("<br>", unsafe_allow_html=True)
     st.subheader("📂 รายละเอียดข้อมูลดิบ (Raw Data Table)")
 
-    st.markdown("#### 📂 ตารางข้อมูลทั้งหมด")
-
-    with st.expander("", expanded=True):
-    st.dataframe(df, use_container_width=True, height=400)
+    with st.expander("🔍 คลิกเพื่อดูหรือซ่อนตารางข้อมูลทั้งหมด", expanded=True):
         st.dataframe(df, use_container_width=True, height=400)
 
     csv_data = df.to_csv(index=False).encode("utf-8-sig")
@@ -603,4 +580,3 @@ except Exception as e:
         "(Anyone with the link) และคอลัมน์ในชีทมีชื่อถูกต้องตามที่โปรแกรมต้องการ "
         "(เช่น Date, Person Count)"
     )
-    
