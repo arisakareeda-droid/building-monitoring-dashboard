@@ -303,7 +303,7 @@ col_logo, col_title, col_status = st.columns([1, 6, 2])
 
 with col_logo:
     try:
-        st.image("logo_proj.jpg", width=90)
+        st.image("logo_proj.png", width=90)
     except Exception:
         st.markdown("<h1>🏢</h1>", unsafe_allow_html=True)
 
