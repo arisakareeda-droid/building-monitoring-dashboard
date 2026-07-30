@@ -295,13 +295,6 @@ def apply_theme_css(t: dict):
         font-family:'Kanit',sans-serif !important;
     }}
 
-    //* ซ่อนปุ่มพับ Sidebar และตัวหนังสือไอคอนที่ค้างอยู่ */
-    button[kind="header"], 
-    [data-testid="collapsedControl"], 
-    [data-testid="stHeader"] {{
-        display: none !important;
-    }}
-
     </style>
     """,
         unsafe_allow_html=True,
