@@ -113,11 +113,13 @@ def apply_theme_css(t: dict):
     st.markdown(
         f"""
     <style>
-    /* บังคับโหลดและใช้ฟอนต์ Kanit กับทุกสมาชิกรวมถึง Shadow DOM ของ Streamlit */
     @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap');
 
-    #MainMenu {{visibility: hidden;}}
-    footer {{visibility: hidden;}}
+    /* ซ่อนแถบเมนู โลโก้ และปุ่ม Streamlit ทั้งหมดให้เกลี้ยง */
+    #MainMenu {{visibility: hidden !important;}}
+    footer {{visibility: hidden !important; display: none !important;}}
+    header {{visibility: hidden !important;}}
+    .viewerBadge_container__1QSob, div[data-testid="stStatusWidget"] {{display: none !important;}}
 
     html, body, [class*="css"], .stApp, p, span, div, label, input, button, table, th, td {{
         font-family: 'Kanit', sans-serif !important;
