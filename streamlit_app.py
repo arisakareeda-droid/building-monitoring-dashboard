@@ -114,17 +114,32 @@ def apply_theme_css(t: dict):
     st.markdown(
         f"""
     <style>
-    /* ซ่อนแถบด้านบนและ Toolbar ของ Streamlit ทั้งหมด */
-    header[data-testid="stHeader"], 
+    /* บังคับซ่อนแถบสีดำและเครื่องมือส่วนบนของ Streamlit แบบเด็ดขาด */
+    header, 
+    div[data-testid="stHeader"], 
+    div[data-testid="stToolbar"], 
     div[data-testid="stDecoration"], 
-    div[data-testid="stStatusWidget"] {{
+    div[data-testid="stStatusWidget"],
+    #MainMenu {{
         display: none !important;
         visibility: hidden !important;
+        height: 0px !important;
     }}
 
-    /* ดึงเนื้อหาหลักด้านบนขึ้นไปชิดขอบจอ */
+    /* ซ่อนข้อความไอคอนตกค้างใน Sidebar และเปลี่ยนเป็นสัญลักษณ์ ➔ / ⬅ แทน */
+    button[kind="header"] span,
+    section[data-testid="stSidebar"] [data-testid="collapsedControl"] {{
+        display: none !important;
+    }}
+
+    /* สร้างปุ่มควบคุมย่อขยาย Sidebar ใหม่ให้เป็นสัญลักษณ์สวยงามสะอาดตา */
+    [data-testid="stSidebarNav"] {{
+        margin-top: 0px;
+    }}
+
+    /* ดึงหน้าเว็บให้ชิดขอบบนสุดและแก้ปัญหาช่องว่าง */
     .block-container {{
-        padding-top: 2rem !important;
+        padding-top: 1.5rem !important;
     }}
 
     /* บังคับใช้ฟอนต์ Kanit ทั้งหมดรวมถึง Element ภายในและ Widget ทุกตัว */
