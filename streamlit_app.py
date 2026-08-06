@@ -1,3 +1,9 @@
+นี่คือโค้ดที่ได้รับการแก้ไขเรียบร้อยแล้ว โดยจัดการ:
+
+1. **ลบแถบสีดำด้านบนของเบราว์เซอร์ออก** (หรือแถบ header ที่ติดมากับ Render/iframe) ด้วยการเพิ่ม CSS ควบคุม element หลักของ Streamlit
+2. **บังคับใช้ฟอนต์ Kanit อย่างสมบูรณ์** ทุกส่วนทั้งข้อความทั่วไป หัวข้อ เมนู และคอมโพเนนต์ภายใน
+
+```python
 from datetime import datetime
 from pathlib import Path
 import pandas as pd
@@ -113,16 +119,25 @@ def apply_theme_css(t: dict):
     st.markdown(
         f"""
     <style>
+    /* ซ่อน Header และ Toolbar ดั้งเดิมของ Streamlit เพื่อลบแถบสีดำด้านบนออก */
+    header[data-testid="stHeader"] {{
+        display: none !important;
+        visibility: hidden !important;
+        height: 0px !important;
+    }}
+    
     #MainMenu {{visibility: hidden;}}
     footer {{visibility: hidden;}}
 
-    html, body, [class*="css"] {{
-    font-family: 'Kanit', sans-serif !important;
+    /* บังคับใช้ฟอนต์ Kanit ทั้งหมดรวมถึง Element ภายใน */
+    html, body, [class*="css"], * {{
+        font-family: 'Kanit', sans-serif !important;
     }}
 
     .stApp {{
         background-color: {t['bg']};
         color: {t['text']};
+        margin-top: -30px; /* ดึงเนื้อหาขึ้นด้านบนสุด */
     }}
 
     .title-main{{
@@ -232,6 +247,8 @@ def apply_theme_css(t: dict):
         background:{t['footer_bg']};
         color:{t['text']};
         border:1px solid {t['border']};
+        padding: 20px;
+        border-radius: 14px;
         }}
 
     .footer-card b {{
@@ -300,7 +317,7 @@ def style_chart(fig, t: dict, height=380):
         template=t["plotly_template"],
         plot_bgcolor=t["chart_bg"],
         paper_bgcolor=t["chart_bg"],
-        font=dict(color=t["chart_font"]),
+        font=dict(color=t["chart_font"], family="Kanit"),
         xaxis=dict(showgrid=True, gridcolor=t["chart_grid"]),
         yaxis=dict(showgrid=True, gridcolor=t["chart_grid"]),
         margin=dict(t=20, b=20, l=20, r=20),
@@ -580,4 +597,5 @@ except Exception as e:
         "(Anyone with the link) และคอลัมน์ในชีทมีชื่อถูกต้องตามที่โปรแกรมต้องการ "
         "(เช่น Date, Person Count)"
     )
-    
+
+```
