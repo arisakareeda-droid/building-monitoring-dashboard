@@ -4,7 +4,6 @@ import pandas as pd
 import plotly.express as px
 from PIL import Image, ImageDraw, ImageOps
 import streamlit as st
-import streamlit.components.v1 as components
 
 
 def make_circular_favicon(path: str, size: int = 256):
@@ -101,22 +100,19 @@ THEMES = {
 
 
 def apply_theme_css(t: dict):
-    components.html(
-        """
+    # หมายเหตุสำคัญ: ต้องฝัง <link> โหลดฟอนต์ไว้ใน st.markdown เดียวกับ <style>
+    # ห้ามใช้ components.html แยก เพราะมันสร้าง iframe คนละ document กับหน้าเว็บหลัก
+    # ทำให้ฟอนต์ที่โหลดไปไม่ถูกนำมาใช้กับ widget จริงในหน้าเว็บ
+    st.markdown(
+        f"""
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    """,
-        height=0,
-    )
 
-    st.markdown(
-        f"""
     <style>
     #MainMenu {{visibility: hidden;}}
     footer {{visibility: hidden;}}
 
-    /* บังคับเปลี่ยนสีแถบ Header ด้านบนสุดทั้งหมดให้เปลี่ยนตามธีม */
     header[data-testid="stHeader"], 
     div[data-testid="stToolbar"], 
     div[data-testid="stDecoration"],
@@ -125,13 +121,13 @@ def apply_theme_css(t: dict):
         background-image: none !important;
     }}
 
-    /* ปรับสีไอคอนปุ่มเมนูบน Header ให้มองเห็นได้ชัดเจน */
     header[data-testid="stHeader"] button {{
         color: {t['text']} !important;
     }}
 
-    html, body, [class*="css"] {{
-    font-family: 'Kanit', sans-serif !important;
+    html, body, [class*="css"],
+    .stApp, .stApp * {{
+        font-family: 'Kanit', sans-serif !important;
     }}
 
     .stApp {{
@@ -152,7 +148,6 @@ def apply_theme_css(t: dict):
         font-weight:500;
     }}
 
-    /* Glassmorphism KPI cards */
     .kpi-card {{
         background: {t['card_bg']};
         backdrop-filter: blur(14px);
@@ -185,7 +180,6 @@ def apply_theme_css(t: dict):
         font-weight:600;
     }}
 
-    /* Chart container */
     div[data-testid="stPlotlyChart"] {{
         color:{t['text']};
         background: {t['card_bg']};
@@ -196,7 +190,6 @@ def apply_theme_css(t: dict):
         box-shadow: 0 8px 24px rgba(0,0,0,0.06);
     }}
 
-    /* Sidebar */
     section[data-testid="stSidebar"] {{
         background: {t['sidebar_grad']};
         border-right: 1px solid rgba(255,255,255,0.08);
@@ -212,7 +205,6 @@ def apply_theme_css(t: dict):
         border-radius: 8px;
     }}
 
-    /* Status badge */
     .status-badge {{
         display: inline-flex;
         align-items: center;
@@ -240,7 +232,6 @@ def apply_theme_css(t: dict):
         box-shadow: 0 0 6px currentColor;
     }}
 
-    /* Footer */
     .footer-card {{
         text-align:center;
         background:{t['footer_bg']};
@@ -252,7 +243,6 @@ def apply_theme_css(t: dict):
         color: {t['text']};
     }}
 
-    /* Expander fix */
     div[data-testid="stExpander"] {{
         background: {t['expander_bg']};
         border-radius: 14px;
@@ -314,7 +304,7 @@ def style_chart(fig, t: dict, height=380):
         template=t["plotly_template"],
         plot_bgcolor=t["chart_bg"],
         paper_bgcolor=t["chart_bg"],
-        font=dict(color=t["chart_font"]),
+        font=dict(color=t["chart_font"], family="Kanit"),
         xaxis=dict(showgrid=True, gridcolor=t["chart_grid"]),
         yaxis=dict(showgrid=True, gridcolor=t["chart_grid"]),
         margin=dict(t=20, b=20, l=20, r=20),
