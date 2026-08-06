@@ -126,15 +126,16 @@ def apply_theme_css(t: dict):
         height: 0px !important;
     }}
 
-    /* จัดการปุ่มเปิด/ปิด Sidebar ไม่ให้แสดงข้อความคีย์บอร์ด */
+    /* จัดการซ่อนข้อความ keyboard_double ขาดหายที่ค้างอยู่ตรงปุ่ม sidebar */
     button[kind="header"],
     [data-testid="collapsedControl"] {{
         font-size: 0px !important;
         color: transparent !important;
         background-color: transparent !important;
+        overflow: hidden !important;
+        text-indent: -9999px !important;
     }}
 
-    /* ซ่อนเนื้อหาภายในทั้งหมดของปุ่มเดิม */
     button[kind="header"] *,
     [data-testid="collapsedControl"] * {{
         display: none !important;
@@ -143,15 +144,17 @@ def apply_theme_css(t: dict):
         color: transparent !important;
     }}
 
-    /* แสดงผลลูกศรใหม่แทนที่อย่างสะอาดตา */
+    /* แสดงลูกศรตกแต่งใหม่ที่สะอาดตาแทน */
     button[kind="header"]::after,
     [data-testid="collapsedControl"]::after {{
         content: "➔" !important;
-        font-size: 18px !important;
+        text-indent: 0 !important;
+        font-size: 16px !important;
         font-weight: bold !important;
         display: inline-block !important;
         visibility: visible !important;
         color: {t['text']} !important;
+        line-height: normal !important;
     }}
 
     /* ดึงหน้าเว็บให้ชิดขอบบนสุดและแก้ปัญหาช่องว่าง */
