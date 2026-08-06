@@ -116,7 +116,7 @@ def apply_theme_css(t: dict):
     #MainMenu {{visibility: hidden;}}
     footer {{visibility: hidden;}}
 
-    /* บังคับเปลี่ยนสีแถบ Header ด้านบนสุดให้เป็นสีเทา */
+    /* แถบ Header ด้านบนสุดสีเทา */
     header[data-testid="stHeader"], 
     div[data-testid="stToolbar"], 
     div[data-testid="stDecoration"],
@@ -125,13 +125,13 @@ def apply_theme_css(t: dict):
         background-image: none !important;
     }}
 
-    /* ปรับสีไอคอนปุ่มเมนูบน Header ให้มองเห็นได้ชัดเจนบนพื้นสีเทา */
     header[data-testid="stHeader"] button {{
         color: #1e293b !important;
     }}
 
+    /* เปลี่ยนฟอนต์ภาษาไทยทั้งหมดเป็น Kanit */
     html, body, [class*="css"] {{
-    font-family: 'Kanit', sans-serif !important;
+        font-family: 'Kanit', sans-serif !important;
     }}
 
     .stApp {{
@@ -277,18 +277,11 @@ def apply_theme_css(t: dict):
     }}
 
     h1,h2,h3,h4,h5,h6{{
-    color:{t['text']} !important;
+        color:{t['text']} !important;
+        font-family: 'Kanit', sans-serif !important;
     }}
 
     label,p,span,div{{
-        color:{t['text']};
-    }}
-
-    .stMarkdown{{
-        color:{t['text']};
-    }}
-
-    .stDataFrame{{
         color:{t['text']};
     }}
 
@@ -314,7 +307,7 @@ def style_chart(fig, t: dict, height=380):
         template=t["plotly_template"],
         plot_bgcolor=t["chart_bg"],
         paper_bgcolor=t["chart_bg"],
-        font=dict(color=t["chart_font"]),
+        font=dict(color=t["chart_font"], family="Kanit"),
         xaxis=dict(showgrid=True, gridcolor=t["chart_grid"]),
         yaxis=dict(showgrid=True, gridcolor=t["chart_grid"]),
         margin=dict(t=20, b=20, l=20, r=20),
