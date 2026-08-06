@@ -126,22 +126,6 @@ def apply_theme_css(t: dict):
         height: 0px !important;
     }}
 
-    /* ซ่อนข้อความบั๊ก keyboard_double และเปลี่ยนเป็นสัญลักษณ์ไอคอนลูกศรแทน */
-    button[kind="header"] span,
-    [data-testid="collapsedControl"] span,
-    header[data-testid="stHeader"] span {{
-        font-size: 0px !important;
-    }}
-
-    button[kind="header"]::after,
-    [data-testid="collapsedControl"]::after {{
-        content: "➔" !important;
-        font-size: 18px !important;
-        font-weight: bold !important;
-        display: inline-block !important;
-        color: inherit !important;
-    }}
-
     /* ดึงหน้าเว็บให้ชิดขอบบนสุดและแก้ปัญหาช่องว่าง */
     .block-container {{
         padding-top: 1.5rem !important;
