@@ -25,7 +25,7 @@ def make_circular_favicon(path: str, size: int = 256):
 
 
 # ==================================================
-# PAGE CONFIG
+# PAGE CONFIG (บังคับเปิด Sidebar และตั้งค่าหน้าจอ)
 # ==================================================
 _FAVICON_PATH = Path(__file__).parent / "favicon.png"
 _favicon = (
@@ -114,6 +114,12 @@ def apply_theme_css(t: dict):
     st.markdown(
         f"""
     <style>
+    /* บังคับแสดง Sidebar และจัดระเบียบหน้าจอ */
+    section[data-testid="stSidebar"] {{
+        display: block !important;
+        visibility: visible !important;
+    }}
+    
     /* ซ่อน Header และ Toolbar ดั้งเดิมของ Streamlit เพื่อลบแถบสีดำด้านบนออก */
     header[data-testid="stHeader"] {{
         display: none !important;
