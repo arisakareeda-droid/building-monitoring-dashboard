@@ -4,14 +4,10 @@ import pandas as pd
 import plotly.express as px
 from PIL import Image, ImageDraw, ImageOps
 import streamlit as st
-import streamlit.components.v1 as components
 
 
 def make_circular_favicon(path: str, size: int = 256):
-    """ครอปรูปให้เป็นวงกลมโปร่งใส ใช้เฉพาะสำหรับ favicon เท่านั้น
-
-    (ไม่กระทบโลโก้ที่แสดงในหน้าเว็บ)
-    """
+    """ครอปรูปให้เป็นวงกลมโปร่งใส ใช้เฉพาะสำหรับ favicon เท่านั้น"""
     p = Path(path)
     if not p.exists():
         return None
@@ -27,7 +23,7 @@ def make_circular_favicon(path: str, size: int = 256):
 # ==================================================
 # PAGE CONFIG
 # ==================================================
-_FAVICON_PATH = Path(__file__).parent / "favicon.png"
+FAVICON_PATH = Path(__file_).parent / "favicon.png"
 _favicon = (
     make_circular_favicon(str(_FAVICON_PATH))
     if _FAVICON_PATH.exists()
@@ -101,37 +97,54 @@ THEMES = {
 
 
 def apply_theme_css(t: dict):
-    components.html(
-        """
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    """,
-        height=0,
-    )
-
     st.markdown(
         f"""
     <style>
-    /* ซ่อน Header และ Toolbar ดั้งเดิมของ Streamlit เพื่อลบแถบสีดำด้านบนออก */
-    header[data-testid="stHeader"] {{
-        display: none !important;
-        visibility: hidden !important;
-        height: 0px !important;
-    }}
-    
+    @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined');
+
     #MainMenu {{visibility: hidden;}}
     footer {{visibility: hidden;}}
 
-    /* บังคับใช้ฟอนต์ Kanit ทั้งหมดรวมถึง Element ภายใน */
-    html, body, [class*="css"], * {{
+    /* ตั้งค่า Font Kanit ทั่วทั้งหน้า */
+    html, body, [class*="css"], .stApp * {{
         font-family: 'Kanit', sans-serif !important;
     }}
 
     .stApp {{
         background-color: {t['bg']};
         color: {t['text']};
-        margin-top: -30px; /* ดึงเนื้อหาขึ้นด้านบนสุด */
+    }}
+
+    /* แก้ปัญหาสีดำด้านบน Sidebar และแสดงปุ่มย้อนกลับให้สวยงาม */
+    section[data-testid="stSidebar"] {{
+        background: {t['sidebar_grad']} !important;
+        border-right: 1px solid rgba(255,255,255,0.08);
+    }}
+    
+    /* ลบส่วนเกินสีดำเหนือ Sidebar */
+    section[data-testid="stSidebar"] > div:first-child {{
+        background: transparent !important;
+    }}
+
+    /* ปรับแต่งปุ่มซ่อน/เปิด Sidebar ให้แสดงลูกศรย้อนกลับแทนตัวหนังสือ */
+    button[data-testid="stSidebarCollapseButton"], 
+    button[data-testid="baseButton-header"] {{
+        color: #ffffff !important;
+        background: transparent !important;
+    }}
+    
+    button[data-testid="stSidebarCollapseButton"] *, 
+    button[data-testid="baseButton-header"] * {{
+        font-size: 0 !important; /* ซ่อนข้อความคีย์บอร์ดหลุด */
+    }}
+
+    button[data-testid="stSidebarCollapseButton"]::after,
+    button[data-testid="baseButton-header"]::after {{
+        content: '«'; /* เปลี่ยนเป็นสัญลักษณ์ลูกศรย้อนกลับ */
+        font-size: 24px !important;
+        color: #ffffff !important;
+        font-weight: bold;
     }}
 
     .title-main{{
@@ -191,11 +204,6 @@ def apply_theme_css(t: dict):
         box-shadow: 0 8px 24px rgba(0,0,0,0.06);
     }}
 
-    /* Sidebar */
-    section[data-testid="stSidebar"] {{
-        background: {t['sidebar_grad']};
-        border-right: 1px solid rgba(255,255,255,0.08);
-    }}
     section[data-testid="stSidebar"] * {{
         color: #f1f5f9 !important;
     }}
@@ -241,9 +249,10 @@ def apply_theme_css(t: dict):
         background:{t['footer_bg']};
         color:{t['text']};
         border:1px solid {t['border']};
-        padding: 20px;
-        border-radius: 14px;
-        }}
+        padding: 16px;
+        border-radius: 12px;
+        margin-top: 20px;
+    }}
 
     .footer-card b {{
         color: {t['text']};
@@ -274,7 +283,7 @@ def apply_theme_css(t: dict):
     }}
 
     h1,h2,h3,h4,h5,h6{{
-    color:{t['text']} !important;
+        color:{t['text']} !important;
     }}
 
     label,p,span,div{{
@@ -299,7 +308,6 @@ def apply_theme_css(t: dict):
     .stButton button{{
         font-family:'Kanit',sans-serif;
     }}
-
     </style>
     """,
         unsafe_allow_html=True,
@@ -311,7 +319,7 @@ def style_chart(fig, t: dict, height=380):
         template=t["plotly_template"],
         plot_bgcolor=t["chart_bg"],
         paper_bgcolor=t["chart_bg"],
-        font=dict(color=t["chart_font"], family="Kanit"),
+        font=dict(family="Kanit, sans-serif", color=t["chart_font"]),
         xaxis=dict(showgrid=True, gridcolor=t["chart_grid"]),
         yaxis=dict(showgrid=True, gridcolor=t["chart_grid"]),
         margin=dict(t=20, b=20, l=20, r=20),
@@ -431,9 +439,9 @@ try:
             ]
 
         st.markdown("---")
-        st.markdown(f"📊 **จำนวนข้อมูลสุทธิ:** `{len(df):,} รายการ`")
+        st.markdown(f"📊 *จำนวนข้อมูลสุทธิ:* {len(df):,} รายการ")
         st.markdown(
-            f"🕒 **อัปเดตล่าสุด:** `{datetime.now().strftime('%d/%m/%Y %H:%M:%S')}`"
+            f"🕒 *อัปเดตล่าสุด:* {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}"
         )
 
     if df.empty:
