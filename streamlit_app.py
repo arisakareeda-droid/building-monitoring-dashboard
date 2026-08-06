@@ -113,16 +113,11 @@ def apply_theme_css(t: dict):
     st.markdown(
         f"""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap');
+    #MainMenu {{visibility: hidden;}}
+    footer {{visibility: hidden;}}
 
-    /* ซ่อนแถบเมนู โลโก้ และปุ่ม Streamlit ทั้งหมดให้เกลี้ยง */
-    #MainMenu {{visibility: hidden !important;}}
-    footer {{visibility: hidden !important; display: none !important;}}
-    header {{visibility: hidden !important;}}
-    .viewerBadge_container__1QSob, div[data-testid="stStatusWidget"] {{display: none !important;}}
-
-    html, body, [class*="css"], .stApp, p, span, div, label, input, button, table, th, td {{
-        font-family: 'Kanit', sans-serif !important;
+    html, body, [class*="css"] {{
+    font-family: 'Kanit', sans-serif !important;
     }}
 
     .stApp {{
@@ -194,7 +189,6 @@ def apply_theme_css(t: dict):
     }}
     section[data-testid="stSidebar"] * {{
         color: #f1f5f9 !important;
-        font-family: 'Kanit', sans-serif !important;
     }}
     section[data-testid="stSidebar"] .stTextInput input,
     section[data-testid="stSidebar"] .stDateInput input {{
@@ -238,8 +232,6 @@ def apply_theme_css(t: dict):
         background:{t['footer_bg']};
         color:{t['text']};
         border:1px solid {t['border']};
-        padding: 16px;
-        border-radius: 14px;
         }}
 
     .footer-card b {{
@@ -271,7 +263,7 @@ def apply_theme_css(t: dict):
     }}
 
     h1,h2,h3,h4,h5,h6{{
-        color:{t['text']} !important;
+    color:{t['text']} !important;
     }}
 
     label,p,span,div{{
@@ -287,14 +279,14 @@ def apply_theme_css(t: dict):
     }}
 
     .stDownloadButton button{{
-        font-family:'Kanit',sans-serif !important;
+        font-family:'Kanit',sans-serif;
         background-color: {t['table_bg']} !important;
         color: {t['text']} !important;
         border: 1px solid {t['border']} !important;
     }}
 
     .stButton button{{
-        font-family:'Kanit',sans-serif !important;
+        font-family:'Kanit',sans-serif;
     }}
 
     </style>
@@ -308,7 +300,7 @@ def style_chart(fig, t: dict, height=380):
         template=t["plotly_template"],
         plot_bgcolor=t["chart_bg"],
         paper_bgcolor=t["chart_bg"],
-        font=dict(color=t["chart_font"], family="Kanit"),
+        font=dict(color=t["chart_font"]),
         xaxis=dict(showgrid=True, gridcolor=t["chart_grid"]),
         yaxis=dict(showgrid=True, gridcolor=t["chart_grid"]),
         margin=dict(t=20, b=20, l=20, r=20),
@@ -588,3 +580,4 @@ except Exception as e:
         "(Anyone with the link) และคอลัมน์ในชีทมีชื่อถูกต้องตามที่โปรแกรมต้องการ "
         "(เช่น Date, Person Count)"
     )
+    
