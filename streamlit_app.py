@@ -114,6 +114,11 @@ def apply_theme_css(t: dict):
     st.markdown(
         f"""
     <style>
+    /* ซ่อนแถบด้านบนของ Streamlit (Header & Toolbar) */
+    header[data-testid="stHeader"] {{
+        display: none !important;
+    }}
+
     /* บังคับใช้ฟอนต์ Kanit ทั้งหมดรวมถึง Element ภายในและ Widget ทุกตัว */
     html, body, [class*="css"], *, input, textarea, button, select, label {{
         font-family: 'Kanit', sans-serif !important;
