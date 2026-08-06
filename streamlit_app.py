@@ -1,9 +1,3 @@
-นี่คือโค้ดที่ได้รับการแก้ไขเรียบร้อยแล้ว โดยจัดการ:
-
-1. **ลบแถบสีดำด้านบนของเบราว์เซอร์ออก** (หรือแถบ header ที่ติดมากับ Render/iframe) ด้วยการเพิ่ม CSS ควบคุม element หลักของ Streamlit
-2. **บังคับใช้ฟอนต์ Kanit อย่างสมบูรณ์** ทุกส่วนทั้งข้อความทั่วไป หัวข้อ เมนู และคอมโพเนนต์ภายใน
-
-```python
 from datetime import datetime
 from pathlib import Path
 import pandas as pd
@@ -597,5 +591,3 @@ except Exception as e:
         "(Anyone with the link) และคอลัมน์ในชีทมีชื่อถูกต้องตามที่โปรแกรมต้องการ "
         "(เช่น Date, Person Count)"
     )
-
-```
