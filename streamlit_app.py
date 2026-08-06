@@ -107,20 +107,6 @@ def apply_theme_css(t: dict):
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script>
-    // สคริปต์กวาดล้างและลบ title ทิ้งทันทีเพื่อป้องกันข้อความเด้งตอนเอาเมาส์ชี้
-    function clearTooltips() {
-        const elements = window.parent.document.querySelectorAll('[data-testid="collapsedControl"], button[kind="header"], [title*="keyboard"]');
-        elements.forEach(el => {
-            el.removeAttribute('title');
-        });
-    }
-    const observer = new MutationObserver(clearTooltips);
-    window.addEventListener('DOMContentLoaded', () => {
-        observer.observe(window.parent.document.body, { childList: true, subtree: true });
-    });
-    setInterval(clearTooltips, 100);
-    </script>
     """,
         height=0,
     )
@@ -140,19 +126,24 @@ def apply_theme_css(t: dict):
         height: 0px !important;
     }}
 
-    /* กำจัดข้อความทั้งหมดและใส่สัญลักษณ์ลูกศรแทน */
+    /* จัดการปุ่มเปิด/ปิด Sidebar ไม่ให้แสดงข้อความคีย์บอร์ด */
     button[kind="header"],
     [data-testid="collapsedControl"] {{
         font-size: 0px !important;
         color: transparent !important;
+        background-color: transparent !important;
     }}
 
+    /* ซ่อนเนื้อหาภายในทั้งหมดของปุ่มเดิม */
     button[kind="header"] *,
     [data-testid="collapsedControl"] * {{
         display: none !important;
         visibility: hidden !important;
+        font-size: 0px !important;
+        color: transparent !important;
     }}
 
+    /* แสดงผลลูกศรใหม่แทนที่อย่างสะอาดตา */
     button[kind="header"]::after,
     [data-testid="collapsedControl"]::after {{
         content: "➔" !important;
