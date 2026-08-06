@@ -108,20 +108,18 @@ def apply_theme_css(t: dict):
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script>
-    // สคริปต์ช่วยดักลบ title แฝงที่ทำให้เกิดข้อความเด้งตอนชี้เมาส์
-    function removeTooltips() {
-        try {
-            const targets = window.parent.document.querySelectorAll('[data-testid="collapsedControl"], button[kind="header"]');
-            targets.forEach(el => {
-                el.removeAttribute('title');
-            });
-        } catch(e) {}
+    // สคริปต์กวาดล้างและลบ title ทิ้งทันทีเพื่อป้องกันข้อความเด้งตอนเอาเมาส์ชี้
+    function clearTooltips() {
+        const elements = window.parent.document.querySelectorAll('[data-testid="collapsedControl"], button[kind="header"], [title*="keyboard"]');
+        elements.forEach(el => {
+            el.removeAttribute('title');
+        });
     }
-    const observer = new MutationObserver(removeTooltips);
+    const observer = new MutationObserver(clearTooltips);
     window.addEventListener('DOMContentLoaded', () => {
         observer.observe(window.parent.document.body, { childList: true, subtree: true });
     });
-    setInterval(removeTooltips, 300);
+    setInterval(clearTooltips, 100);
     </script>
     """,
         height=0,
@@ -142,26 +140,21 @@ def apply_theme_css(t: dict):
         height: 0px !important;
     }}
 
-    /* กำจัดข้อความ keyboard_double ทั้งหมด และใส่สัญลักษณ์ลูกศรแทน */
+    /* กำจัดข้อความทั้งหมดและใส่สัญลักษณ์ลูกศรแทน */
     button[kind="header"],
-    [data-testid="collapsedControl"],
-    header[data-testid="stHeader"] button {{
+    [data-testid="collapsedControl"] {{
         font-size: 0px !important;
         color: transparent !important;
     }}
 
     button[kind="header"] *,
-    [data-testid="collapsedControl"] *,
-    header[data-testid="stHeader"] button * {{
+    [data-testid="collapsedControl"] * {{
         display: none !important;
         visibility: hidden !important;
-        font-size: 0px !important;
-        color: transparent !important;
     }}
 
     button[kind="header"]::after,
-    [data-testid="collapsedControl"]::after,
-    header[data-testid="stHeader"] button::after {{
+    [data-testid="collapsedControl"]::after {{
         content: "➔" !important;
         font-size: 18px !important;
         font-weight: bold !important;
