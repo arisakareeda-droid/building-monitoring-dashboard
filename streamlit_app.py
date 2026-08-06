@@ -126,15 +126,20 @@ def apply_theme_css(t: dict):
         height: 0px !important;
     }}
 
-    /* ซ่อนข้อความไอคอนตกค้างใน Sidebar และเปลี่ยนเป็นสัญลักษณ์ ➔ / ⬅ แทน */
+    /* ซ่อนข้อความบั๊ก keyboard_double และเปลี่ยนเป็นสัญลักษณ์ไอคอนลูกศรแทน */
     button[kind="header"] span,
-    section[data-testid="stSidebar"] [data-testid="collapsedControl"] {{
-        display: none !important;
+    [data-testid="collapsedControl"] span,
+    header[data-testid="stHeader"] span {{
+        font-size: 0px !important;
     }}
 
-    /* สร้างปุ่มควบคุมย่อขยาย Sidebar ใหม่ให้เป็นสัญลักษณ์สวยงามสะอาดตา */
-    [data-testid="stSidebarNav"] {{
-        margin-top: 0px;
+    button[kind="header"]::after,
+    [data-testid="collapsedControl"]::after {{
+        content: "➔" !important;
+        font-size: 18px !important;
+        font-weight: bold !important;
+        display: inline-block !important;
+        color: inherit !important;
     }}
 
     /* ดึงหน้าเว็บให้ชิดขอบบนสุดและแก้ปัญหาช่องว่าง */
