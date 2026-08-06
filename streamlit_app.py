@@ -131,7 +131,7 @@ def apply_theme_css(t: dict):
     .stApp {{
         background-color: {t['bg']};
         color: {t['text']};
-        margin-top: -30px; /* ดึงเนื้อหาขึ้นด้านบนสุด */
+        margin-top: -30px;
     }}
 
     .title-main{{
