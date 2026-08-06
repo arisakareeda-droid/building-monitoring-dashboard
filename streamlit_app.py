@@ -107,6 +107,22 @@ def apply_theme_css(t: dict):
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+    // สคริปต์ช่วยดักลบ title แฝงที่ทำให้เกิดข้อความเด้งตอนชี้เมาส์
+    function removeTooltips() {
+        try {
+            const targets = window.parent.document.querySelectorAll('[data-testid="collapsedControl"], button[kind="header"]');
+            targets.forEach(el => {
+                el.removeAttribute('title');
+            });
+        } catch(e) {}
+    }
+    const observer = new MutationObserver(removeTooltips);
+    window.addEventListener('DOMContentLoaded', () => {
+        observer.observe(window.parent.document.body, { childList: true, subtree: true });
+    });
+    setInterval(removeTooltips, 300);
+    </script>
     """,
         height=0,
     )
