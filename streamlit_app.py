@@ -114,9 +114,17 @@ def apply_theme_css(t: dict):
     st.markdown(
         f"""
     <style>
-    /* ซ่อนแถบด้านบนของ Streamlit (Header & Toolbar) */
-    header[data-testid="stHeader"] {{
+    /* ซ่อนแถบด้านบนและ Toolbar ของ Streamlit ทั้งหมด */
+    header[data-testid="stHeader"], 
+    div[data-testid="stDecoration"], 
+    div[data-testid="stStatusWidget"] {{
         display: none !important;
+        visibility: hidden !important;
+    }}
+
+    /* ดึงเนื้อหาหลักด้านบนขึ้นไปชิดขอบจอ */
+    .block-container {{
+        padding-top: 2rem !important;
     }}
 
     /* บังคับใช้ฟอนต์ Kanit ทั้งหมดรวมถึง Element ภายในและ Widget ทุกตัว */
