@@ -38,7 +38,6 @@ st.set_page_config(
     page_title="Building Monitoring & Analytics Dashboard",
     page_icon=_favicon,
     layout="wide",
-    initial_sidebar_state="expanded",
 )
 
 SHEET_URL = (
@@ -114,57 +113,11 @@ def apply_theme_css(t: dict):
     st.markdown(
         f"""
     <style>
-    /* บังคับซ่อนแถบสีดำและเครื่องมือส่วนบนของ Streamlit */
-    header, 
-    div[data-testid="stHeader"], 
-    div[data-testid="stToolbar"], 
-    div[data-testid="stDecoration"], 
-    div[data-testid="stStatusWidget"],
-    #MainMenu {{
-        display: none !important;
-        visibility: hidden !important;
-        height: 0px !important;
-    }}
+    #MainMenu {{visibility: hidden;}}
+    footer {{visibility: hidden;}}
 
-    /* จัดการซ่อนข้อความ keyboard_double ขาดหายที่ค้างอยู่ตรงปุ่ม sidebar */
-    button[kind="header"],
-    [data-testid="collapsedControl"] {{
-        font-size: 0px !important;
-        color: transparent !important;
-        background-color: transparent !important;
-        overflow: hidden !important;
-        text-indent: -9999px !important;
-    }}
-
-    button[kind="header"] *,
-    [data-testid="collapsedControl"] * {{
-        display: none !important;
-        visibility: hidden !important;
-        font-size: 0px !important;
-        color: transparent !important;
-    }}
-
-    /* แสดงลูกศรตกแต่งใหม่ที่สะอาดตาแทน */
-    button[kind="header"]::after,
-    [data-testid="collapsedControl"]::after {{
-        content: "➔" !important;
-        text-indent: 0 !important;
-        font-size: 16px !important;
-        font-weight: bold !important;
-        display: inline-block !important;
-        visibility: visible !important;
-        color: {t['text']} !important;
-        line-height: normal !important;
-    }}
-
-    /* ดึงหน้าเว็บให้ชิดขอบบนสุดและแก้ปัญหาช่องว่าง */
-    .block-container {{
-        padding-top: 1.5rem !important;
-    }}
-
-    /* บังคับใช้ฟอนต์ Kanit ทั้งหมดรวมถึง Element ภายในและ Widget ทุกตัว */
-    html, body, [class*="css"], *, input, textarea, button, select, label {{
-        font-family: 'Kanit', sans-serif !important;
+    html, body, [class*="css"] {{
+    font-family: 'Kanit', sans-serif !important;
     }}
 
     .stApp {{
@@ -236,7 +189,6 @@ def apply_theme_css(t: dict):
     }}
     section[data-testid="stSidebar"] * {{
         color: #f1f5f9 !important;
-        font-family: 'Kanit', sans-serif !important;
     }}
     section[data-testid="stSidebar"] .stTextInput input,
     section[data-testid="stSidebar"] .stDateInput input {{
@@ -280,9 +232,7 @@ def apply_theme_css(t: dict):
         background:{t['footer_bg']};
         color:{t['text']};
         border:1px solid {t['border']};
-        padding: 20px;
-        border-radius: 14px;
-    }}
+        }}
 
     .footer-card b {{
         color: {t['text']};
@@ -313,7 +263,7 @@ def apply_theme_css(t: dict):
     }}
 
     h1,h2,h3,h4,h5,h6{{
-        color:{t['text']} !important;
+    color:{t['text']} !important;
     }}
 
     label,p,span,div{{
@@ -350,7 +300,7 @@ def style_chart(fig, t: dict, height=380):
         template=t["plotly_template"],
         plot_bgcolor=t["chart_bg"],
         paper_bgcolor=t["chart_bg"],
-        font=dict(color=t["chart_font"], family="Kanit"),
+        font=dict(color=t["chart_font"]),
         xaxis=dict(showgrid=True, gridcolor=t["chart_grid"]),
         yaxis=dict(showgrid=True, gridcolor=t["chart_grid"]),
         margin=dict(t=20, b=20, l=20, r=20),
@@ -385,7 +335,7 @@ with st.sidebar:
     except Exception:
         pass
 
-    st.markdown("### ⚙️ แผงควบคุมระบบ")
+    st.markdown("### ⚙️ Dashboard Controls")
 
     theme_choice = st.radio(
         "🎨 ธีมการแสดงผล",
@@ -630,3 +580,4 @@ except Exception as e:
         "(Anyone with the link) และคอลัมน์ในชีทมีชื่อถูกต้องตามที่โปรแกรมต้องการ "
         "(เช่น Date, Person Count)"
     )
+    
