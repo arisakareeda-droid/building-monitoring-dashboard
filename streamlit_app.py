@@ -114,7 +114,7 @@ def apply_theme_css(t: dict):
     st.markdown(
         f"""
     <style>
-    /* บังคับซ่อนแถบสีดำและเครื่องมือส่วนบนของ Streamlit แบบเด็ดขาด */
+    /* บังคับซ่อนแถบสีดำและเครื่องมือส่วนบนของ Streamlit */
     header, 
     div[data-testid="stHeader"], 
     div[data-testid="stToolbar"], 
@@ -124,6 +124,34 @@ def apply_theme_css(t: dict):
         display: none !important;
         visibility: hidden !important;
         height: 0px !important;
+    }}
+
+    /* กำจัดข้อความ keyboard_double ทั้งหมด และใส่สัญลักษณ์ลูกศรแทน */
+    button[kind="header"],
+    [data-testid="collapsedControl"],
+    header[data-testid="stHeader"] button {{
+        font-size: 0px !important;
+        color: transparent !important;
+    }}
+
+    button[kind="header"] *,
+    [data-testid="collapsedControl"] *,
+    header[data-testid="stHeader"] button * {{
+        display: none !important;
+        visibility: hidden !important;
+        font-size: 0px !important;
+        color: transparent !important;
+    }}
+
+    button[kind="header"]::after,
+    [data-testid="collapsedControl"]::after,
+    header[data-testid="stHeader"] button::after {{
+        content: "➔" !important;
+        font-size: 18px !important;
+        font-weight: bold !important;
+        display: inline-block !important;
+        visibility: visible !important;
+        color: {t['text']} !important;
     }}
 
     /* ดึงหน้าเว็บให้ชิดขอบบนสุดและแก้ปัญหาช่องว่าง */
@@ -251,7 +279,7 @@ def apply_theme_css(t: dict):
         border:1px solid {t['border']};
         padding: 20px;
         border-radius: 14px;
-        }}
+    }}
 
     .footer-card b {{
         color: {t['text']};
@@ -282,7 +310,7 @@ def apply_theme_css(t: dict):
     }}
 
     h1,h2,h3,h4,h5,h6{{
-    color:{t['text']} !important;
+        color:{t['text']} !important;
     }}
 
     label,p,span,div{{
