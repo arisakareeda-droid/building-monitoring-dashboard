@@ -25,7 +25,7 @@ def make_circular_favicon(path: str, size: int = 256):
 
 
 # ==================================================
-# PAGE CONFIG (บังคับเปิด Sidebar และตั้งค่าหน้าจอ)
+# PAGE CONFIG
 # ==================================================
 _FAVICON_PATH = Path(__file__).parent / "favicon.png"
 _favicon = (
@@ -38,7 +38,6 @@ st.set_page_config(
     page_title="Building Monitoring & Analytics Dashboard",
     page_icon=_favicon,
     layout="wide",
-    initial_sidebar_state="expanded",
 )
 
 SHEET_URL = (
@@ -114,12 +113,6 @@ def apply_theme_css(t: dict):
     st.markdown(
         f"""
     <style>
-    /* บังคับแสดง Sidebar และจัดระเบียบหน้าจอ */
-    section[data-testid="stSidebar"] {{
-        display: block !important;
-        visibility: visible !important;
-    }}
-    
     /* ซ่อน Header และ Toolbar ดั้งเดิมของ Streamlit เพื่อลบแถบสีดำด้านบนออก */
     header[data-testid="stHeader"] {{
         display: none !important;
@@ -130,8 +123,8 @@ def apply_theme_css(t: dict):
     #MainMenu {{visibility: hidden;}}
     footer {{visibility: hidden;}}
 
-    /* บังคับใช้ฟอนต์ Kanit ทั้งหมดรวมถึง Element ภายในและ Widget ทุกตัว */
-    html, body, [class*="css"], *, input, textarea, button, select, label {{
+    /* บังคับใช้ฟอนต์ Kanit ทั้งหมดรวมถึง Element ภายใน */
+    html, body, [class*="css"], * {{
         font-family: 'Kanit', sans-serif !important;
     }}
 
@@ -205,7 +198,6 @@ def apply_theme_css(t: dict):
     }}
     section[data-testid="stSidebar"] * {{
         color: #f1f5f9 !important;
-        font-family: 'Kanit', sans-serif !important;
     }}
     section[data-testid="stSidebar"] .stTextInput input,
     section[data-testid="stSidebar"] .stDateInput input {{
@@ -354,7 +346,7 @@ with st.sidebar:
     except Exception:
         pass
 
-    st.markdown("### ⚙️ แผงควบคุมระบบ")
+    st.markdown("### ⚙️ Dashboard Controls")
 
     theme_choice = st.radio(
         "🎨 ธีมการแสดงผล",
