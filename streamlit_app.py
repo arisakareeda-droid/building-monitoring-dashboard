@@ -116,9 +116,18 @@ def apply_theme_css(t: dict):
     #MainMenu {{visibility: hidden;}}
     footer {{visibility: hidden;}}
 
-    /* เปลี่ยนสีแถบ Header ด้านบนสุดให้เปลี่ยนตามธีม */
-    header[data-testid="stHeader"] {{
+    /* บังคับเปลี่ยนสีแถบ Header ด้านบนสุดทั้งหมดให้เปลี่ยนตามธีม */
+    header[data-testid="stHeader"], 
+    div[data-testid="stToolbar"], 
+    div[data-testid="stDecoration"],
+    header {{
         background-color: {t['bg']} !important;
+        background-image: none !important;
+    }}
+
+    /* ปรับสีไอคอนปุ่มเมนูบน Header ให้มองเห็นได้ชัดเจน */
+    header[data-testid="stHeader"] button {{
+        color: {t['text']} !important;
     }}
 
     html, body, [class*="css"] {{
