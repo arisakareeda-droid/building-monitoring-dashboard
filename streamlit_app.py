@@ -116,6 +116,11 @@ def apply_theme_css(t: dict):
     #MainMenu {{visibility: hidden;}}
     footer {{visibility: hidden;}}
 
+    /* เปลี่ยนสีแถบ Header ด้านบนสุดให้เปลี่ยนตามธีม */
+    header[data-testid="stHeader"] {{
+        background-color: {t['bg']} !important;
+    }}
+
     html, body, [class*="css"] {{
     font-family: 'Kanit', sans-serif !important;
     }}
@@ -580,4 +585,3 @@ except Exception as e:
         "(Anyone with the link) และคอลัมน์ในชีทมีชื่อถูกต้องตามที่โปรแกรมต้องการ "
         "(เช่น Date, Person Count)"
     )
-    
