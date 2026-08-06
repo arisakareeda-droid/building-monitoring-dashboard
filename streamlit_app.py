@@ -38,6 +38,7 @@ st.set_page_config(
     page_title="Building Monitoring & Analytics Dashboard",
     page_icon=_favicon,
     layout="wide",
+    initial_sidebar_state="expanded",
 )
 
 SHEET_URL = (
@@ -113,11 +114,9 @@ def apply_theme_css(t: dict):
     st.markdown(
         f"""
     <style>
-    #MainMenu {{visibility: hidden;}}
-    footer {{visibility: hidden;}}
-
-    html, body, [class*="css"] {{
-    font-family: 'Kanit', sans-serif !important;
+    /* บังคับใช้ฟอนต์ Kanit ทั้งหมดรวมถึง Element ภายในและ Widget ทุกตัว */
+    html, body, [class*="css"], *, input, textarea, button, select, label {{
+        font-family: 'Kanit', sans-serif !important;
     }}
 
     .stApp {{
@@ -189,6 +188,7 @@ def apply_theme_css(t: dict):
     }}
     section[data-testid="stSidebar"] * {{
         color: #f1f5f9 !important;
+        font-family: 'Kanit', sans-serif !important;
     }}
     section[data-testid="stSidebar"] .stTextInput input,
     section[data-testid="stSidebar"] .stDateInput input {{
@@ -232,6 +232,8 @@ def apply_theme_css(t: dict):
         background:{t['footer_bg']};
         color:{t['text']};
         border:1px solid {t['border']};
+        padding: 20px;
+        border-radius: 14px;
         }}
 
     .footer-card b {{
@@ -300,7 +302,7 @@ def style_chart(fig, t: dict, height=380):
         template=t["plotly_template"],
         plot_bgcolor=t["chart_bg"],
         paper_bgcolor=t["chart_bg"],
-        font=dict(color=t["chart_font"]),
+        font=dict(color=t["chart_font"], family="Kanit"),
         xaxis=dict(showgrid=True, gridcolor=t["chart_grid"]),
         yaxis=dict(showgrid=True, gridcolor=t["chart_grid"]),
         margin=dict(t=20, b=20, l=20, r=20),
@@ -335,7 +337,7 @@ with st.sidebar:
     except Exception:
         pass
 
-    st.markdown("### ⚙️ Dashboard Controls")
+    st.markdown("### ⚙️ แผงควบคุมระบบ")
 
     theme_choice = st.radio(
         "🎨 ธีมการแสดงผล",
@@ -580,4 +582,3 @@ except Exception as e:
         "(Anyone with the link) และคอลัมน์ในชีทมีชื่อถูกต้องตามที่โปรแกรมต้องการ "
         "(เช่น Date, Person Count)"
     )
-    
