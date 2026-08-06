@@ -123,8 +123,8 @@ def apply_theme_css(t: dict):
     #MainMenu {{visibility: hidden;}}
     footer {{visibility: hidden;}}
 
-    /* บังคับใช้ฟอนต์ Kanit ทั้งหมดรวมถึง Element ภายใน */
-    html, body, [class*="css"], * {{
+    /* บังคับใช้ฟอนต์ Kanit ทั้งหมดรวมถึง Element ภายในและ Widget ทุกตัว */
+    html, body, [class*="css"], *, input, textarea, button, select, label {{
         font-family: 'Kanit', sans-serif !important;
     }}
 
@@ -198,6 +198,7 @@ def apply_theme_css(t: dict):
     }}
     section[data-testid="stSidebar"] * {{
         color: #f1f5f9 !important;
+        font-family: 'Kanit', sans-serif !important;
     }}
     section[data-testid="stSidebar"] .stTextInput input,
     section[data-testid="stSidebar"] .stDateInput input {{
@@ -346,7 +347,7 @@ with st.sidebar:
     except Exception:
         pass
 
-    st.markdown("### ⚙️ Dashboard Controls")
+    st.markdown("### ⚙️ แผงควบคุมระบบ")
 
     theme_choice = st.radio(
         "🎨 ธีมการแสดงผล",
