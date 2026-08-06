@@ -38,6 +38,7 @@ st.set_page_config(
     page_title="Building Monitoring & Analytics Dashboard",
     page_icon=_favicon,
     layout="wide",
+    initial_sidebar_state="expanded",
 )
 
 SHEET_URL = (
