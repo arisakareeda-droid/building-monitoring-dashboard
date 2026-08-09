@@ -336,20 +336,21 @@ def apply_theme_css(t: dict):
         border: 1px solid {t['border']};
         border-radius: 12px;
     }}
+    /* แก้ไขสีข้อความและหัวข้อใน Expander ให้อ่านง่ายเสมอ */
     div[data-testid="stExpander"] summary,
     div[data-testid="stExpander"] summary *,
     div[data-testid="stExpander"] details summary,
     div[data-testid="stExpander"] details summary *,
     div[data-testid="stExpander"] [data-testid="stMarkdownContainer"] p,
     div[data-testid="stExpander"] span,
-    div[data-testid="stExpander"] label {{
+    div[data-testid="stExpander"] label {
         color: {t['text']} !important;
         font-weight: 500;
-    }}
+    }
     div[data-testid="stExpander"] summary:hover,
-    div[data-testid="stExpander"] summary:hover * {{
+    div[data-testid="stExpander"] summary:hover * {
         color: {t['primary']} !important;
-    }}
+    }
 
     h1,h2,h3,h4,h5,h6 {{ color: {t['text']} !important; }}
     label,p,span,div {{ color: {t['text']}; }}
