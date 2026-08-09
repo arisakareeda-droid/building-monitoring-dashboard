@@ -344,11 +344,16 @@ def apply_theme_css(t: dict):
 
     h1,h2,h3,h4,h5,h6 {{ color: {t['text']} !important; }}
     label,p,span,div {{ color: {t['text']}; }}
-    .stDownloadButton button {{
-        color: {t['text']} !important;
-        border: 1px solid {t['border']} !important;
-        border-radius: 8px;
-        font-weight: 500;
+    div.stDownloadButton > button {{
+        background-color: {t['btn_bg']} !important;
+        color: {t['btn_text']} !important;
+        border: 1px solid {t['btn_border']} !important;
+        border-radius: 8px !important;
+        font-weight: 500 !important;
+    }}
+    div.stDownloadButton > button:hover {{
+        border-color: {t['btn_hover_border']} !important;
+        color: {t['btn_hover_text']} !important;
     }}
 
     @media (max-width: 768px) {{
@@ -412,8 +417,13 @@ def section_header(text: str) -> str:
 def load_data():
     df = pd.read_csv(SHEET_URL)
     df.columns = df.columns.str.strip()
+    
+    # === นำ 2 บรรทัดนี้ไปใส่เพิ่ม ===
+    if "Date" in df.columns:
+        df["Date"] = pd.to_datetime(df["Date"], errors="coerce").dt.strftime("%Y-%m-%d")
+    # ==========================
+    
     return df
-
 
 # ==================================================
 # SIDEBAR
