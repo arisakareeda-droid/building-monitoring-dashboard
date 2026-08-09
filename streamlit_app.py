@@ -141,8 +141,17 @@ def apply_theme_css(t: dict):
     }}
     header[data-testid="stHeader"] button {{ color: {t['text']} !important; }}
 
-    html, body, [class*="css"], .stApp, .stApp * {{
+    html, body, p, span, div, label, h1, h2, h3, h4, h5, h6,
+    button, input, select, textarea, a {{
         font-family: 'Kanit', sans-serif;
+    }}
+    /* กันไม่ให้ฟอนต์ Kanit ไปทับไอคอนของ Streamlit (Material Symbols)
+       ไม่งั้นไอคอนลูกศรของ Expander จะโชว์เป็นตัวหนังสือดิบแทนรูปไอคอน */
+    [data-testid="stExpanderIcon"],
+    [data-testid="stIconMaterial"],
+    .material-symbols-outlined,
+    [class*="material-icon"] {{
+        font-family: 'Material Symbols Outlined', 'Material Icons' !important;
     }}
     .mono {{ font-family: 'IBM Plex Mono', monospace; }}
 
@@ -317,10 +326,17 @@ def apply_theme_css(t: dict):
     }}
     div[data-testid="stExpander"] summary,
     div[data-testid="stExpander"] summary *,
+    div[data-testid="stExpander"] details summary,
+    div[data-testid="stExpander"] details summary *,
     div[data-testid="stExpander"] [data-testid="stMarkdownContainer"] p,
     div[data-testid="stExpander"] span,
     div[data-testid="stExpander"] label {{
         color: {t['text']} !important;
+        font-weight: 500;
+    }}
+    div[data-testid="stExpander"] summary:hover,
+    div[data-testid="stExpander"] summary:hover * {{
+        color: {t['primary']} !important;
     }}
 
     h1,h2,h3,h4,h5,h6 {{ color: {t['text']} !important; }}
