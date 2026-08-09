@@ -129,233 +129,45 @@ def apply_theme_css(t: dict):
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
 
     <style>
-    #MainMenu {{visibility: hidden;}}
-    footer {{visibility: hidden;}}
+        #MainMenu {{visibility: hidden;}}
+        footer {{visibility: hidden;}}
 
-    header[data-testid="stHeader"],
-    div[data-testid="stToolbar"],
-    div[data-testid="stDecoration"],
-    header {{
-        background-color: {t['bg']} !important;
-        background-image: none !important;
-    }}
-    header[data-testid="stHeader"] button {{ color: {t['text']} !important; }}
+        header[data-testid="stHeader"],
+        div[data-testid="stToolbar"],
+        div[data-testid="stDecoration"],
+        header {{
+            background-color: {t['bg']} !important;
+            background-image: none !important;
+        }}
+        header[data-testid="stHeader"] button {{ color: {t['text']} !important; }}
 
-    html, body, p, span, div, label, h1, h2, h3, h4, h5, h6,
-    button, input, select, textarea, a {{
-        font-family: 'Kanit', sans-serif;
-    }}
-    /* กันไม่ให้ฟอนต์ Kanit ไปทับไอคอนของ Streamlit (Material Symbols)
-       ใช้ attribute-contains แทนชื่อ testid เป๊ะๆ เพราะแต่ละเวอร์ชัน Streamlit ตั้งชื่อไม่เหมือนกัน */
-    [data-testid*="Icon"],
-    [class*="material-symbols"],
-    [class*="material-icon"],
-    span[class*="eyeicon"] {{
-        font-family: 'Material Symbols Outlined', 'Material Symbols Rounded',
-                      'Material Icons', sans-serif !important;
-        font-feature-settings: 'liga' !important;
-        -webkit-font-feature-settings: 'liga' !important;
-    }}
-    .mono {{ font-family: 'IBM Plex Mono', monospace; }}
+        html, body, p, span, div, label, h1, h2, h3, h4, h5, h6,
+        button, input, select, textarea, a {{
+            font-family: 'Kanit', sans-serif;
+        }}
+        
+        [data-testid*="Icon"],
+        [class*="material-symbols"],
+        [class*="material-icon"],
+        span[class*="eyeicon"] {{
+            font-family: 'Material Symbols Outlined', 'Material Symbols Rounded',
+                         'Material Icons', sans-serif !important;
+            font-feature-settings: 'liga' !important;
+            -webkit-font-feature-settings: 'liga' !important;
+        }}
+        .mono {{ font-family: 'IBM Plex Mono', monospace; }}
 
-    .stApp {{ background-color: {t['bg']}; color: {t['text']}; }}
+        .stApp {{ background-color: {t['bg']}; color: {t['text']}; }}
 
-    /* ---------- Header ---------- */
-    .title-main {{
-        font-size: 32px;
-        font-weight: 600;
-        color: {t['text']};
-        line-height: 1.25;
-        letter-spacing: -0.2px;
-    }}
-    .subtitle-main {{
-        font-size: 14.5px;
-        color: {t['subtitle']};
-        font-weight: 400;
-        margin-top: 2px;
-    }}
+        /* ... โค้ดส่วนอื่นๆ ของคุณ ... */
 
-    /* ---------- Live status strip (signature element) ---------- */
-    .status-strip {{
-        display: flex;
-        align-items: center;
-        gap: 22px;
-        background: {t['surface']};
-        border: 1px solid {t['border']};
-        border-radius: 10px;
-        padding: 10px 18px;
-        margin: 18px 0 22px 0;
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: 12.5px;
-        color: {t['subtitle']};
-        flex-wrap: wrap;
-    }}
-    .status-strip .divider {{
-        width: 1px; height: 14px; background: {t['border']};
-    }}
-    .status-item {{ display: flex; align-items: center; gap: 7px; }}
-    .status-item svg {{ flex-shrink: 0; }}
-    .status-online-dot {{
-        width: 7px; height: 7px; border-radius: 50%;
-        background: {t['success']};
-        box-shadow: 0 0 0 3px rgba(21,128,61,0.15);
-        animation: pulse-dot 2s ease-in-out infinite;
-    }}
-    .status-offline-dot {{
-        width: 7px; height: 7px; border-radius: 50%;
-        background: {t['danger']};
-        box-shadow: 0 0 0 3px rgba(180,35,24,0.15);
-    }}
-    @keyframes pulse-dot {{
-        0%, 100% {{ opacity: 1; }}
-        50% {{ opacity: 0.45; }}
-    }}
-    .status-label {{
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
-        font-weight: 500;
-        color: {t['text']};
-    }}
-
-    /* ---------- KPI cards (hairline, flat — ไม่ใช้ glass) ---------- */
-    .kpi-card {{
-        background: {t['surface']};
-        border: 1px solid {t['border']};
-        border-radius: 12px;
-        padding: 20px 22px;
-        height: 100%;
-    }}
-    .kpi-top {{
-        display: flex; align-items: center; justify-content: space-between;
-        margin-bottom: 14px;
-    }}
-    .kpi-icon {{
-        width: 34px; height: 34px;
-        display: flex; align-items: center; justify-content: center;
-        border-radius: 8px;
-        background: {t['bg']};
-        color: {t['primary']};
-        border: 1px solid {t['border']};
-    }}
-    .kpi-label {{
-        font-size: 12.5px;
-        font-weight: 500;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: {t['subtitle']};
-    }}
-    .kpi-value {{
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: 30px;
-        font-weight: 600;
-        color: {t['text']};
-        letter-spacing: -0.5px;
-    }}
-    .kpi-delta {{
-        font-size: 12.5px;
-        color: {t['accent']};
-        font-weight: 500;
-        margin-top: 4px;
-    }}
-
-    /* ---------- Chart container ---------- */
-    div[data-testid="stPlotlyChart"] {{
-        background: {t['surface']};
-        border: 1px solid {t['border']};
-        border-radius: 12px;
-        padding: 16px;
-    }}
-
-    /* ---------- Section headers: accent bar แทน emoji ---------- */
-    .section-head {{
-        display: flex; align-items: center; gap: 10px;
-        margin: 6px 0 14px 0;
-    }}
-    .section-bar {{
-        width: 3px; height: 18px; border-radius: 2px;
-        background: {t['accent']};
-        flex-shrink: 0;
-    }}
-    .section-title {{
-        font-size: 17px; font-weight: 600; color: {t['text']};
-    }}
-
-    /* ---------- Sidebar ---------- */
-    section[data-testid="stSidebar"] {{
-        background: {t['sidebar_grad']};
-        border-right: 1px solid rgba(255,255,255,0.06);
-    }}
-    section[data-testid="stSidebar"] * {{ color: #EDF1F7 !important; }}
-    section[data-testid="stSidebar"] .stTextInput input,
-    section[data-testid="stSidebar"] .stDateInput input {{
-        background-color: rgba(255,255,255,0.07);
-        color: #fff !important;
-        border: 1px solid rgba(255,255,255,0.14);
-        border-radius: 7px;
-    }}
-    .sidebar-eyebrow {{
-        font-size: 11px;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        color: rgba(237,241,247,0.55) !important;
-        font-weight: 500;
-        margin-top: 4px;
-    }}
-    .sidebar-meta {{
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: 12px;
-        color: rgba(237,241,247,0.75) !important;
-        line-height: 1.9;
-    }}
-
-    /* ---------- Footer ---------- */
-    .footer-card {{
-        text-align: center;
-        background: {t['footer_bg']};
-        border: 1px solid {t['border']};
-        border-radius: 12px;
-        padding: 18px;
-        margin-top: 32px;
-        color: {t['subtitle']};
-        font-size: 13px;
-    }}
-    .footer-card b {{ color: {t['text']}; font-weight: 600; }}
-
-    /* ---------- Expander ---------- */
-    div[data-testid="stExpander"] {{
-        background: {t['surface']};
-        border: 1px solid {t['border']};
-        border-radius: 12px;
-    }}
-    div[data-testid="stExpander"] summary,
-    div[data-testid="stExpander"] summary *,
-    div[data-testid="stExpander"] details summary,
-    div[data-testid="stExpander"] details summary *,
-    div[data-testid="stExpander"] [data-testid="stMarkdownContainer"] p,
-    div[data-testid="stExpander"] span,
-    div[data-testid="stExpander"] label {{
-        color: {t['text']} !important;
-        font-weight: 500;
-    }}
-    div[data-testid="stExpander"] summary:hover,
-    div[data-testid="stExpander"] summary:hover * {{
-        color: {t['primary']} !important;
-    }}
-
-    h1,h2,h3,h4,h5,h6 {{ color: {t['text']} !important; }}
-    label,p,span,div {{ color: {t['text']}; }}
-    .stDownloadButton button {{
-        color: {t['text']} !important;
-        border: 1px solid {t['border']} !important;
-        border-radius: 8px;
-        font-weight: 500;
-    }}
-
-    @media (max-width: 768px) {{
-        .title-main {{ font-size: 24px; }}
-        .kpi-value {{ font-size: 24px; }}
-        .status-strip {{ font-size: 11px; gap: 14px; }}
-    }}
+        /* ส่วนที่คุณเพิ่มใหม่ (ผมแก้ไขปีกกาให้แล้ว) */
+        [data-testid="stDataFrame"] thead tr th {{
+            background-color: {t['bg']} !important;
+            color: {t['text']} !important;
+            font-weight: 600 !important;
+            border-bottom: 2px solid {t['primary']} !important;
+        }}
     </style>
     """,
         unsafe_allow_html=True,
