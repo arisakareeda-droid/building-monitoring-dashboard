@@ -327,13 +327,6 @@ def apply_theme_css(t: dict):
         border: 1px solid {t['border']};
         border-radius: 12px;
     }}
-    /* ปรับหัวข้อตาราง (Column Headers) ให้สีชัดตามธีม */
-    [data-testid="stDataFrame"] thead tr th {
-        background-color: {t['bg']} !important;
-        color: {t['text']} !important;
-        font-weight: 600 !important;
-        border-bottom: 2px solid {t['primary']} !important;
-    }
     div[data-testid="stExpander"] summary,
     div[data-testid="stExpander"] summary *,
     div[data-testid="stExpander"] details summary,
