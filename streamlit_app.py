@@ -356,13 +356,6 @@ def apply_theme_css(t: dict):
         .kpi-value {{ font-size: 24px; }}
         .status-strip {{ font-size: 11px; gap: 14px; }}
     }}
-    /* ปรับหัวข้อตาราง (Column Headers) ให้สีชัดตามธีม */
-    [data-testid="stDataFrame"] thead tr th {
-        background-color: {t['bg']} !important;
-        color: {t['text']} !important;
-        font-weight: 600 !important;
-        border-bottom: 2px solid {t['primary']} !important;
-    }
     </style>
     """,
         unsafe_allow_html=True,
