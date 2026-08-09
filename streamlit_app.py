@@ -4,13 +4,39 @@ import pandas as pd
 import plotly.express as px
 from PIL import Image, ImageDraw, ImageOps
 import streamlit as st
+from streamlit_autorefresh import st_autorefresh
+
+
+# ==================================================
+# ICON SET (เส้นบาง แบบ minimal, ไม่ใช้ emoji)
+# ==================================================
+ICONS = {
+    "records": """<path d="M7 3h7l4 4v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/>
+        <path d="M14 3v4h4"/><path d="M9 12h6M9 15.5h6M9 8.5h3"/>""",
+    "users": """<circle cx="8.5" cy="8" r="3"/>
+        <path d="M2.5 19.5c0-3.3 2.7-6 6-6s6 2.7 6 6"/>
+        <circle cx="17" cy="9" r="2.4"/><path d="M15.2 13.3c2.5.4 4.3 2.5 4.3 5.2"/>""",
+    "trending": """<path d="M3 17l6-6 4 4 8-8"/><path d="M15 6h6v6"/>""",
+    "signal": """<path d="M2 8.5a15 15 0 0 1 20 0"/>
+        <path d="M5.5 12a10 10 0 0 1 13 0"/>
+        <path d="M9 15.5a5 5 0 0 1 6 0"/><circle cx="12" cy="19" r="1" fill="currentColor" stroke="none"/>""",
+    "clock": """<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>""",
+    "download": """<path d="M12 3v12"/><path d="M7 11l5 5 5-5"/><path d="M4 19h16"/>""",
+}
+
+
+def icon_svg(name: str, size: int = 18) -> str:
+    body = ICONS.get(name, "")
+    return (
+        f'<svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" '
+        f'stroke="currentColor" stroke-width="1.6" stroke-linecap="round" '
+        f'stroke-linejoin="round">{body}</svg>'
+    )
 
 
 def make_circular_favicon(path: str, size: int = 256):
     """ครอปรูปให้เป็นวงกลมโปร่งใส ใช้เฉพาะสำหรับ favicon เท่านั้น
-
-    (ไม่กระทบโลโก้ที่แสดงในหน้าเว็บ)
-    """
+    (ไม่กระทบโลโก้ที่แสดงในหน้าเว็บ)"""
     p = Path(path)
     if not p.exists():
         return None
@@ -28,9 +54,7 @@ def make_circular_favicon(path: str, size: int = 256):
 # ==================================================
 _FAVICON_PATH = Path(__file__).parent / "favicon.png"
 _favicon = (
-    make_circular_favicon(str(_FAVICON_PATH))
-    if _FAVICON_PATH.exists()
-    else "🏢"
+    make_circular_favicon(str(_FAVICON_PATH)) if _FAVICON_PATH.exists() else "▪"
 )
 
 st.set_page_config(
@@ -46,253 +70,274 @@ SHEET_URL = (
 )
 
 # ==================================================
-# THEME STATE
+# THEME STATE — โทนสีปรับใหม่ให้ดูพรีเมียมขึ้น (บรอนซ์นวลแทนทองสด)
 # ==================================================
 if "theme" not in st.session_state:
     st.session_state.theme = "Light"
 
 THEMES = {
     "Light": {
-        "bg": "#f8fafc",
-        "card_bg": "rgba(255,255,255,0.75)",
-        "card_border": "#dbe4f0",
-        "text": "#1e293b",
-        "subtitle": "#475569",
-        "primary": "#002D72",
-        "accent": "#D4AF37",
-        "sidebar_grad": "linear-gradient(180deg,#002D72 0%,#001a41 100%)",
+        "bg": "#F7F8FA",
+        "surface": "#FFFFFF",
+        "border": "#E4E7EC",
+        "text": "#101828",
+        "subtitle": "#667085",
+        "primary": "#0B2545",
+        "accent": "#A6803D",
+        "sidebar_grad": "linear-gradient(180deg,#0B2545 0%,#061527 100%)",
         "chart_bg": "rgba(0,0,0,0)",
-        "chart_grid": "#dbe4f0",
-        "chart_font": "#1e293b",
+        "chart_grid": "#E4E7EC",
+        "chart_font": "#101828",
         "plotly_template": "plotly_white",
-        "line_color": "#002D72",
-        "marker_color": "#D4AF37",
-        "area_color": "#1d4ed8",
+        "line_color": "#0B2545",
+        "marker_color": "#A6803D",
+        "area_color": "#2451A6",
         "bar_scale": "Blues",
-        "expander_bg": "#ffffff",
-        "table_bg": "#ffffff",
-        "footer_bg": "#ffffff",
-        "border": "#dbe4f0",
+        "footer_bg": "#FFFFFF",
+        "success": "#15803D",
+        "danger": "#B42318",
     },
     "Dark": {
-        "bg": "#0b1120",
-        "card_bg": "rgba(255,255,255,0.06)",
-        "card_border": "rgba(255,255,255,0.12)",
-        "text": "#e2e8f0",
-        "subtitle": "#94a3b8",
-        "primary": "#7fa8ff",
-        "accent": "#f5cf6b",
-        "sidebar_grad": "linear-gradient(180deg,#0b1120 0%,#000000 100%)",
+        "bg": "#0A0E1A",
+        "surface": "#10162A",
+        "border": "#212B45",
+        "text": "#E7EBF3",
+        "subtitle": "#8B96AC",
+        "primary": "#6EA8FE",
+        "accent": "#D9B871",
+        "sidebar_grad": "linear-gradient(180deg,#0A0E1A 0%,#000000 100%)",
         "chart_bg": "rgba(0,0,0,0)",
-        "chart_grid": "#1e293b",
-        "chart_font": "#e2e8f0",
+        "chart_grid": "#212B45",
+        "chart_font": "#E7EBF3",
         "plotly_template": "plotly_dark",
-        "line_color": "#7fa8ff",
-        "marker_color": "#f5cf6b",
-        "area_color": "#3b82f6",
+        "line_color": "#6EA8FE",
+        "marker_color": "#D9B871",
+        "area_color": "#3B6FD6",
         "bar_scale": "Blues",
-        "expander_bg": "#111827",
-        "table_bg": "#111827",
-        "footer_bg": "#111827",
-        "border": "#1e293b",
+        "footer_bg": "#10162A",
+        "success": "#4ADE80",
+        "danger": "#F87171",
     },
 }
 
 
 def apply_theme_css(t: dict):
-    # หมายเหตุสำคัญ: ต้องฝัง <link> โหลดฟอนต์ไว้ใน st.markdown เดียวกับ <style>
-    # ห้ามใช้ components.html แยก เพราะมันสร้าง iframe คนละ document กับหน้าเว็บหลัก
-    # ทำให้ฟอนต์ที่โหลดไปไม่ถูกนำมาใช้กับ widget จริงในหน้าเว็บ
     st.markdown(
         f"""
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
     <style>
     #MainMenu {{visibility: hidden;}}
     footer {{visibility: hidden;}}
 
-    header[data-testid="stHeader"], 
-    div[data-testid="stToolbar"], 
+    header[data-testid="stHeader"],
+    div[data-testid="stToolbar"],
     div[data-testid="stDecoration"],
     header {{
         background-color: {t['bg']} !important;
         background-image: none !important;
     }}
+    header[data-testid="stHeader"] button {{ color: {t['text']} !important; }}
 
-    header[data-testid="stHeader"] button {{
-        color: {t['text']} !important;
+    html, body, [class*="css"], .stApp, .stApp * {{
+        font-family: 'Kanit', sans-serif;
+    }}
+    .mono {{ font-family: 'IBM Plex Mono', monospace; }}
+
+    .stApp {{ background-color: {t['bg']}; color: {t['text']}; }}
+
+    /* ---------- Header ---------- */
+    .title-main {{
+        font-size: 32px;
+        font-weight: 600;
+        color: {t['text']};
+        line-height: 1.25;
+        letter-spacing: -0.2px;
+    }}
+    .subtitle-main {{
+        font-size: 14.5px;
+        color: {t['subtitle']};
+        font-weight: 400;
+        margin-top: 2px;
     }}
 
-    html, body, [class*="css"],
-    .stApp, .stApp * {{
-        font-family: 'Kanit', sans-serif !important;
+    /* ---------- Live status strip (signature element) ---------- */
+    .status-strip {{
+        display: flex;
+        align-items: center;
+        gap: 22px;
+        background: {t['surface']};
+        border: 1px solid {t['border']};
+        border-radius: 10px;
+        padding: 10px 18px;
+        margin: 18px 0 22px 0;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 12.5px;
+        color: {t['subtitle']};
+        flex-wrap: wrap;
     }}
-
-    .stApp {{
-        background-color: {t['bg']};
+    .status-strip .divider {{
+        width: 1px; height: 14px; background: {t['border']};
+    }}
+    .status-item {{ display: flex; align-items: center; gap: 7px; }}
+    .status-item svg {{ flex-shrink: 0; }}
+    .status-online-dot {{
+        width: 7px; height: 7px; border-radius: 50%;
+        background: {t['success']};
+        box-shadow: 0 0 0 3px rgba(21,128,61,0.15);
+        animation: pulse-dot 2s ease-in-out infinite;
+    }}
+    .status-offline-dot {{
+        width: 7px; height: 7px; border-radius: 50%;
+        background: {t['danger']};
+        box-shadow: 0 0 0 3px rgba(180,35,24,0.15);
+    }}
+    @keyframes pulse-dot {{
+        0%, 100% {{ opacity: 1; }}
+        50% {{ opacity: 0.45; }}
+    }}
+    .status-label {{
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        font-weight: 500;
         color: {t['text']};
     }}
 
-    .title-main{{
-        font-size:38px;
-        font-weight:700;
-        color:{t['primary']};
-        line-height:1.2;
-    }}
-
-    .subtitle-main{{
-        font-size:17px;
-        color:{t['subtitle']};
-        font-weight:500;
-    }}
-
+    /* ---------- KPI cards (hairline, flat — ไม่ใช้ glass) ---------- */
     .kpi-card {{
-        background: {t['card_bg']};
-        backdrop-filter: blur(14px);
-        -webkit-backdrop-filter: blur(14px);
-        border: 1px solid {t['card_border']};
-        border-radius: 18px;
-        padding: 22px 24px;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-        transition: transform 0.25s ease, box-shadow 0.25s ease;
+        background: {t['surface']};
+        border: 1px solid {t['border']};
+        border-radius: 12px;
+        padding: 20px 22px;
         height: 100%;
     }}
-    .kpi-card:hover {{
-        transform: translateY(-4px);
-        box-shadow: 0 14px 28px rgba(0,0,0,0.14);
+    .kpi-top {{
+        display: flex; align-items: center; justify-content: space-between;
+        margin-bottom: 14px;
     }}
-    .kpi-label {{
-        font-size: 15px;
-        font-weight: 600;
-        color: {t['text']};
-        opacity: .85;
-        margin-bottom: 8px;
-    }}
-    .kpi-value {{
-        font-size: 32px;
-        font-weight: 700;
-        color: {t['primary']};
-    }}
-    .kpi-delta {{
-        color: {t['accent']};
-        font-weight:600;
-    }}
-
-    div[data-testid="stPlotlyChart"] {{
-        color:{t['text']};
-        background: {t['card_bg']};
-        backdrop-filter: blur(10px);
-        padding: 18px;
-        border-radius: 18px;
-        border: 1px solid {t['card_border']};
-        box-shadow: 0 8px 24px rgba(0,0,0,0.06);
-    }}
-
-    section[data-testid="stSidebar"] {{
-        background: {t['sidebar_grad']};
-        border-right: 1px solid rgba(255,255,255,0.08);
-    }}
-    section[data-testid="stSidebar"] * {{
-        color: #f1f5f9 !important;
-    }}
-    section[data-testid="stSidebar"] .stTextInput input,
-    section[data-testid="stSidebar"] .stDateInput input {{
-        background-color: rgba(255, 255, 255, 0.1);
-        color: white !important;
-        border: 1px solid rgba(255, 255, 255, 0.2);
+    .kpi-icon {{
+        width: 34px; height: 34px;
+        display: flex; align-items: center; justify-content: center;
         border-radius: 8px;
-    }}
-
-    .status-badge {{
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 6px 14px;
-        border-radius: 999px;
-        font-size: 13px;
-        font-weight: 600;
-    }}
-    .status-online {{
-        background: rgba(34, 197, 94, 0.15);
-        color: #22c55e;
-        border: 1px solid rgba(34, 197, 94, 0.35);
-    }}
-    .status-offline {{
-        background: rgba(239, 68, 68, 0.15);
-        color: #ef4444;
-        border: 1px solid rgba(239, 68, 68, 0.35);
-    }}
-    .status-dot {{
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: currentColor;
-        box-shadow: 0 0 6px currentColor;
-    }}
-
-    .footer-card {{
-        text-align:center;
-        background:{t['footer_bg']};
-        color:{t['text']};
-        border:1px solid {t['border']};
-        }}
-
-    .footer-card b {{
-        color: {t['text']};
-    }}
-
-    div[data-testid="stExpander"] {{
-        background: {t['expander_bg']};
-        border-radius: 14px;
+        background: {t['bg']};
+        color: {t['primary']};
         border: 1px solid {t['border']};
     }}
-    
-    div[data-testid="stExpander"] summary,
-    div[data-testid="stExpander"] summary * {{
-        color: {t['text']} !important;
-        fill: {t['text']} !important;
+    .kpi-label {{
+        font-size: 12.5px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: {t['subtitle']};
+    }}
+    .kpi-value {{
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 30px;
+        font-weight: 600;
+        color: {t['text']};
+        letter-spacing: -0.5px;
+    }}
+    .kpi-delta {{
+        font-size: 12.5px;
+        color: {t['accent']};
+        font-weight: 500;
+        margin-top: 4px;
     }}
 
+    /* ---------- Chart container ---------- */
+    div[data-testid="stPlotlyChart"] {{
+        background: {t['surface']};
+        border: 1px solid {t['border']};
+        border-radius: 12px;
+        padding: 16px;
+    }}
+
+    /* ---------- Section headers: accent bar แทน emoji ---------- */
+    .section-head {{
+        display: flex; align-items: center; gap: 10px;
+        margin: 6px 0 14px 0;
+    }}
+    .section-bar {{
+        width: 3px; height: 18px; border-radius: 2px;
+        background: {t['accent']};
+        flex-shrink: 0;
+    }}
+    .section-title {{
+        font-size: 17px; font-weight: 600; color: {t['text']};
+    }}
+
+    /* ---------- Sidebar ---------- */
+    section[data-testid="stSidebar"] {{
+        background: {t['sidebar_grad']};
+        border-right: 1px solid rgba(255,255,255,0.06);
+    }}
+    section[data-testid="stSidebar"] * {{ color: #EDF1F7 !important; }}
+    section[data-testid="stSidebar"] .stTextInput input,
+    section[data-testid="stSidebar"] .stDateInput input {{
+        background-color: rgba(255,255,255,0.07);
+        color: #fff !important;
+        border: 1px solid rgba(255,255,255,0.14);
+        border-radius: 7px;
+    }}
+    .sidebar-eyebrow {{
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: rgba(237,241,247,0.55) !important;
+        font-weight: 500;
+        margin-top: 4px;
+    }}
+    .sidebar-meta {{
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 12px;
+        color: rgba(237,241,247,0.75) !important;
+        line-height: 1.9;
+    }}
+
+    /* ---------- Footer ---------- */
+    .footer-card {{
+        text-align: center;
+        background: {t['footer_bg']};
+        border: 1px solid {t['border']};
+        border-radius: 12px;
+        padding: 18px;
+        margin-top: 32px;
+        color: {t['subtitle']};
+        font-size: 13px;
+    }}
+    .footer-card b {{ color: {t['text']}; font-weight: 600; }}
+
+    /* ---------- Expander ---------- */
+    div[data-testid="stExpander"] {{
+        background: {t['surface']};
+        border: 1px solid {t['border']};
+        border-radius: 12px;
+    }}
+    div[data-testid="stExpander"] summary,
+    div[data-testid="stExpander"] summary *,
     div[data-testid="stExpander"] [data-testid="stMarkdownContainer"] p,
     div[data-testid="stExpander"] span,
     div[data-testid="stExpander"] label {{
         color: {t['text']} !important;
     }}
 
-    @media (max-width: 768px) {{
-        .title-main {{ font-size: 26px; }}
-        .kpi-value {{ font-size: 24px; }}
-    }}
-
-    h1,h2,h3,h4,h5,h6{{
-    color:{t['text']} !important;
-    }}
-
-    label,p,span,div{{
-        color:{t['text']};
-    }}
-
-    .stMarkdown{{
-        color:{t['text']};
-    }}
-
-    .stDataFrame{{
-        color:{t['text']};
-    }}
-
-    .stDownloadButton button{{
-        font-family:'Kanit',sans-serif;
-        background-color: {t['table_bg']} !important;
+    h1,h2,h3,h4,h5,h6 {{ color: {t['text']} !important; }}
+    label,p,span,div {{ color: {t['text']}; }}
+    .stDownloadButton button {{
+        background-color: {t['surface']} !important;
         color: {t['text']} !important;
         border: 1px solid {t['border']} !important;
+        border-radius: 8px;
+        font-weight: 500;
     }}
 
-    .stButton button{{
-        font-family:'Kanit',sans-serif;
+    @media (max-width: 768px) {{
+        .title-main {{ font-size: 24px; }}
+        .kpi-value {{ font-size: 24px; }}
+        .status-strip {{ font-size: 11px; gap: 14px; }}
     }}
-
     </style>
     """,
         unsafe_allow_html=True,
@@ -313,17 +358,29 @@ def style_chart(fig, t: dict, height=380):
     return fig
 
 
-def kpi_card(label, value, delta):
+def kpi_card(icon: str, label: str, value: str, delta: str) -> str:
     return f"""
     <div class="kpi-card">
-        <div class="kpi-label">{label}</div>
+        <div class="kpi-top">
+            <div class="kpi-label">{label}</div>
+            <div class="kpi-icon">{icon_svg(icon, 17)}</div>
+        </div>
         <div class="kpi-value">{value}</div>
         <div class="kpi-delta">{delta}</div>
     </div>
     """
 
 
-@st.cache_data(ttl=600)
+def section_header(text: str) -> str:
+    return f"""
+    <div class="section-head">
+        <span class="section-bar"></span>
+        <span class="section-title">{text}</span>
+    </div>
+    """
+
+
+@st.cache_data(ttl=30)
 def load_data():
     df = pd.read_csv(SHEET_URL)
     df.columns = df.columns.str.strip()
@@ -339,23 +396,46 @@ with st.sidebar:
     except Exception:
         pass
 
-    st.markdown("### ⚙️ Dashboard Controls")
+    st.markdown(
+        "<div style='font-weight:600;font-size:16px;margin-top:10px;'>"
+        "Dashboard Controls</div>",
+        unsafe_allow_html=True,
+    )
 
+    st.markdown(
+        "<div class='sidebar-eyebrow'>Display theme</div>", unsafe_allow_html=True
+    )
     theme_choice = st.radio(
-        "🎨 ธีมการแสดงผล",
+        "Display theme",
         options=["Light", "Dark"],
         index=0 if st.session_state.theme == "Light" else 1,
         horizontal=True,
+        label_visibility="collapsed",
     )
     st.session_state.theme = theme_choice
     theme = THEMES[theme_choice]
 
     st.markdown("---")
 
-    date_range = None
-    search_query = st.text_input(
-        "🔍 ค้นหาข้อมูลในระบบ", placeholder="พิมพ์คำค้นหา..."
+    st.markdown(
+        "<div class='sidebar-eyebrow'>Auto-refresh interval</div>",
+        unsafe_allow_html=True,
     )
+    refresh_seconds = st.selectbox(
+        "Auto-refresh interval",
+        options=[10, 30, 60, 120],
+        index=1,
+        format_func=lambda s: f"{s} s",
+        label_visibility="collapsed",
+    )
+
+    date_range = None
+    st.markdown("<div class='sidebar-eyebrow'>Search</div>", unsafe_allow_html=True)
+    search_query = st.text_input(
+        "Search", placeholder="Search records...", label_visibility="collapsed"
+    )
+
+st_autorefresh(interval=refresh_seconds * 1000, key="auto_refresh")
 
 apply_theme_css(theme)
 
@@ -368,20 +448,18 @@ with col_logo:
     try:
         st.image("logo_proj.png", width=150)
     except Exception:
-        st.markdown("<h1>🏢</h1>", unsafe_allow_html=True)
+        pass
 
 with col_title:
     st.markdown(
         """
-        <div class="title-main">Building Occupancy & Activity Monitoring Dashboard</div>
-        <div class="subtitle-main">ระบบวิเคราะห์ข้อมูลการเข้า-ออกอาคารอัจฉริยะแบบเรียลไทม์ | Faculty of Engineering, Prince of Songkla University</div>
+        <div class="title-main">Building Occupancy &amp; Activity Monitoring Dashboard</div>
+        <div class="subtitle-main">ระบบวิเคราะห์ข้อมูลการเข้า-ออกอาคารอัจฉริยะแบบเรียลไทม์ &middot; Faculty of Engineering, Prince of Songkla University</div>
         """,
         unsafe_allow_html=True,
     )
 
 status_placeholder = col_status.empty()
-
-st.markdown("<br>", unsafe_allow_html=True)
 
 # ==================================================
 # LOAD DATA + STATUS
@@ -390,16 +468,6 @@ system_online = True
 try:
     df = load_data()
 
-    with status_placeholder:
-        st.markdown(
-            f"""
-            <div class="status-badge status-online">
-                <span class="status-dot"></span> Online
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
     if "Date" in df.columns:
         df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
 
@@ -407,8 +475,14 @@ try:
         if "Date" in df.columns and not df["Date"].isnull().all():
             min_date = df["Date"].min().date()
             max_date = df["Date"].max().date()
+            st.markdown(
+                "<div class='sidebar-eyebrow'>Date range</div>",
+                unsafe_allow_html=True,
+            )
             date_range = st.date_input(
-                "📅 เลือกช่วงวันที่ต้องการดู", [min_date, max_date]
+                "Date range",
+                [min_date, max_date],
+                label_visibility="collapsed",
             )
             if len(date_range) == 2:
                 df = df[
@@ -424,14 +498,48 @@ try:
             ]
 
         st.markdown("---")
-        st.markdown(f"📊 **จำนวนข้อมูลสุทธิ:** `{len(df):,} รายการ`")
         st.markdown(
-            f"🕒 **อัปเดตล่าสุด:** `{datetime.now().strftime('%d/%m/%Y %H:%M:%S')}`"
+            f"""<div class="sidebar-meta">
+            RECORDS &nbsp; {len(df):,}<br>
+            SYNCED &nbsp;&nbsp;&nbsp; {datetime.now().strftime('%H:%M:%S')}
+            </div>""",
+            unsafe_allow_html=True,
+        )
+
+    with status_placeholder:
+        st.markdown(
+            f"""
+            <div class="status-strip" style="justify-content:flex-end;">
+                <div class="status-item">
+                    <span class="status-online-dot"></span>
+                    <span class="status-label">Online</span>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
         )
 
     if df.empty:
-        st.warning("⚠️ ไม่พบข้อมูลตามเงื่อนไขที่เลือก กรุณาตรวจสอบใหม่อีกครั้ง")
+        st.warning("No records match the selected filters. Adjust the date range or search term.")
         st.stop()
+
+    # ==================================================
+    # LIVE STATUS STRIP
+    # ==================================================
+    st.markdown(
+        f"""
+        <div class="status-strip">
+            <div class="status-item">{icon_svg('signal', 15)}<span>Data source: Google Sheets</span></div>
+            <div class="divider"></div>
+            <div class="status-item">{icon_svg('clock', 15)}<span>Last sync {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}</span></div>
+            <div class="divider"></div>
+            <div class="status-item"><span>Refresh every {refresh_seconds}s</span></div>
+            <div class="divider"></div>
+            <div class="status-item"><span>{len(df):,} records</span></div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
     # ==================================================
     # KPI CARDS
@@ -453,21 +561,17 @@ try:
     col1, col2, col3 = st.columns(3)
     with col1:
         st.markdown(
-            kpi_card("📋 Total Records", f"{total_records:,}", "รายการทั้งหมด"),
+            kpi_card("records", "Total Records", f"{total_records:,}", "รายการทั้งหมด"),
             unsafe_allow_html=True,
         )
     with col2:
         st.markdown(
-            kpi_card(
-                "👥 Total Occupancy / Persons", f"{total_people:,}", "ยอดสะสมรวม"
-            ),
+            kpi_card("users", "Total Occupancy", f"{total_people:,}", "ยอดสะสมรวม"),
             unsafe_allow_html=True,
         )
     with col3:
         st.markdown(
-            kpi_card(
-                "📈 Average per Entry", f"{average_people:,}", "ค่าเฉลี่ยต่อรอบ"
-            ),
+            kpi_card("trending", "Average / Entry", f"{average_people:,}", "ค่าเฉลี่ยต่อรอบ"),
             unsafe_allow_html=True,
         )
 
@@ -478,13 +582,13 @@ try:
     # ==================================================
     if "Date" in df.columns and "Person Count" in df.columns:
         daily = (
-            df.groupby("Date")["Person Count"]
-            .sum()
-            .reset_index()
-            .sort_values("Date")
+            df.groupby("Date")["Person Count"].sum().reset_index().sort_values("Date")
         )
 
-        st.subheader("📊 แนวโน้มการเข้า-ออกอาคารรายวัน (Time Series Analysis)")
+        st.markdown(
+            section_header("แนวโน้มการเข้า-ออกอาคารรายวัน — Time Series Analysis"),
+            unsafe_allow_html=True,
+        )
 
         line_fig = px.line(
             daily,
@@ -495,18 +599,19 @@ try:
             labels={"Date": "วันที่", "Person Count": "จำนวนผู้อยู่อาศัย (คน)"},
         )
         line_fig.update_traces(
-            line=dict(width=3), marker=dict(size=8, color=theme["marker_color"])
+            line=dict(width=2.5), marker=dict(size=7, color=theme["marker_color"])
         )
-        st.plotly_chart(
-            style_chart(line_fig, theme, 400), use_container_width=True
-        )
+        st.plotly_chart(style_chart(line_fig, theme, 400), use_container_width=True)
 
         st.markdown("<br>", unsafe_allow_html=True)
 
         col_a, col_b = st.columns(2)
 
         with col_a:
-            st.markdown("##### 📉 สัดส่วนการใช้งานรายวัน (Bar Distribution)")
+            st.markdown(
+                section_header("สัดส่วนการใช้งานรายวัน — Bar Distribution"),
+                unsafe_allow_html=True,
+            )
             bar_fig = px.bar(
                 daily,
                 x="Date",
@@ -521,7 +626,10 @@ try:
             )
 
         with col_b:
-            st.markdown("##### 🌊 ความหนาแน่นสะสม (Cumulative Area Trend)")
+            st.markdown(
+                section_header("ความหนาแน่นสะสม — Cumulative Area Trend"),
+                unsafe_allow_html=True,
+            )
             area_fig = px.area(
                 daily,
                 x="Date",
@@ -537,14 +645,17 @@ try:
     # DATA TABLE & EXPORT
     # ==================================================
     st.markdown("<br>", unsafe_allow_html=True)
-    st.subheader("📂 รายละเอียดข้อมูลดิบ (Raw Data Table)")
+    st.markdown(
+        section_header("รายละเอียดข้อมูลดิบ — Raw Data Table"),
+        unsafe_allow_html=True,
+    )
 
-    with st.expander("🔍 คลิกเพื่อดูหรือซ่อนตารางข้อมูลทั้งหมด", expanded=True):
+    with st.expander("Show / hide full data table", expanded=True):
         st.dataframe(df, use_container_width=True, height=400)
 
     csv_data = df.to_csv(index=False).encode("utf-8-sig")
     st.download_button(
-        label="📥 ดาวน์โหลดรายงานฉบับเต็ม (.CSV)",
+        label="Download full report (.CSV)",
         data=csv_data,
         file_name="Building_Monitoring_Report.csv",
         mime="text/csv",
@@ -556,11 +667,10 @@ try:
     st.markdown(
         f"""
         <div class="footer-card">
-            <b>Building Monitoring & Analytics Dashboard</b><br>
-            Prince of Songkla University · Faculty of Engineering<br>
-            <span style="font-size: 13px;">
-                Academic Project 2026 • Developed with Streamlit & Python •
-                Theme: {theme_choice}
+            <b>Building Monitoring &amp; Analytics Dashboard</b><br>
+            Prince of Songkla University &middot; Faculty of Engineering<br>
+            <span style="font-size: 12px;">
+                Academic Project 2026 &middot; Streamlit &amp; Python &middot; Theme: {theme_choice}
             </span>
         </div>
         """,
@@ -572,13 +682,16 @@ except Exception as e:
     with status_placeholder:
         st.markdown(
             f"""
-            <div class="status-badge status-offline">
-                <span class="status-dot"></span> Offline
+            <div class="status-strip" style="justify-content:flex-end;">
+                <div class="status-item">
+                    <span class="status-offline-dot"></span>
+                    <span class="status-label">Offline</span>
+                </div>
             </div>
             """,
             unsafe_allow_html=True,
         )
-    st.error(f"⚠️ เกิดข้อผิดพลาดในการโหลดหรือประมวลผลข้อมูล: {e}")
+    st.error(f"เกิดข้อผิดพลาดในการโหลดหรือประมวลผลข้อมูล: {e}")
     st.info(
         "คำแนะนำ: กรุณาตรวจสอบว่าลิงก์ Google Sheets เปิดแชร์แบบสาธารณะ "
         "(Anyone with the link) และคอลัมน์ในชีทมีชื่อถูกต้องตามที่โปรแกรมต้องการ "
