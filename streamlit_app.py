@@ -77,25 +77,30 @@ if "theme" not in st.session_state:
 
 THEMES = {
     "Light": {
-    "bg": "#F7F8FA",
-    "surface": "#FFFFFF",
-    "border": "#E4E7EC",
-    "text": "#101828",
-    "subtitle": "#667085",
-    "primary": "#0B2545",
-    "accent": "#A6803D",
-    "sidebar_grad": "linear-gradient(180deg,#0B2545 0%,#061527 100%)",
-    "chart_bg": "rgba(0,0,0,0)",
-    "chart_grid": "#CBD5E1",    # ปรับเส้นกริดให้เข้มขึ้น (จากเดิม #E4E7EC)
-    "chart_font": "#334155",    # ปรับฟอนต์ในกราฟให้เข้มขึ้นเพื่อให้อ่านง่าย
-    "plotly_template": "plotly_white",
-    "line_color": "#0B2545",
-    "marker_color": "#A6803D",
-    "area_color": "#2451A6",
-    "bar_scale": "Blues",
-    "footer_bg": "#FFFFFF",
-    "success": "#15803D",
-    "danger": "#B42318",
+        "bg": "#F7F8FA",
+        "surface": "#FFFFFF",
+        "border": "#E4E7EC",
+        "text": "#101828",
+        "subtitle": "#667085",
+        "primary": "#0B2545",
+        "accent": "#A6803D",
+        "sidebar_grad": "linear-gradient(180deg,#0B2545 0%,#061527 100%)",
+        "chart_bg": "rgba(0,0,0,0)",
+        "chart_grid": "#CBD5E1",
+        "chart_font": "#334155",
+        "plotly_template": "plotly_white",
+        "line_color": "#0B2545",
+        "marker_color": "#A6803D",
+        "area_color": "#2451A6",
+        "bar_scale": "Blues",
+        "footer_bg": "#FFFFFF",
+        "success": "#15803D",
+        "danger": "#B42318",
+        "btn_bg": "#FFFFFF",
+        "btn_text": "#101828",
+        "btn_border": "#D0D5DD",
+        "btn_hover_border": "#0B2545",
+        "btn_hover_text": "#0B2545",
     },
     "Dark": {
         "bg": "#0A0E1A",
@@ -117,9 +122,13 @@ THEMES = {
         "footer_bg": "#10162A",
         "success": "#4ADE80",
         "danger": "#F87171",
+        "btn_bg": "#10162A",
+        "btn_text": "#E7EBF3",
+        "btn_border": "#2E3B59",
+        "btn_hover_border": "#6EA8FE",
+        "btn_hover_text": "#6EA8FE",
     },
 }
-
 
 def apply_theme_css(t: dict):
     st.markdown(
