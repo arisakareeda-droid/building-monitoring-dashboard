@@ -338,7 +338,8 @@ def apply_theme_css(t: dict):
         font-weight: 500;
     }
     div[data-testid="stExpander"] summary:hover,
-    div[data-testid="stExpander"] summary:hover * {
+    div[data-testid="stExpander"] summary:hover * 
+    s{
         color: {t['primary']} !important;
     }
 
