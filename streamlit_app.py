@@ -126,7 +126,7 @@ def apply_theme_css(t: dict):
         f"""
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
 
     <style>
     #MainMenu {{visibility: hidden;}}
@@ -146,12 +146,15 @@ def apply_theme_css(t: dict):
         font-family: 'Kanit', sans-serif;
     }}
     /* กันไม่ให้ฟอนต์ Kanit ไปทับไอคอนของ Streamlit (Material Symbols)
-       ไม่งั้นไอคอนลูกศรของ Expander จะโชว์เป็นตัวหนังสือดิบแทนรูปไอคอน */
-    [data-testid="stExpanderIcon"],
-    [data-testid="stIconMaterial"],
-    .material-symbols-outlined,
-    [class*="material-icon"] {{
-        font-family: 'Material Symbols Outlined', 'Material Icons' !important;
+       ใช้ attribute-contains แทนชื่อ testid เป๊ะๆ เพราะแต่ละเวอร์ชัน Streamlit ตั้งชื่อไม่เหมือนกัน */
+    [data-testid*="Icon"],
+    [class*="material-symbols"],
+    [class*="material-icon"],
+    span[class*="eyeicon"] {{
+        font-family: 'Material Symbols Outlined', 'Material Symbols Rounded',
+                      'Material Icons', sans-serif !important;
+        font-feature-settings: 'liga' !important;
+        -webkit-font-feature-settings: 'liga' !important;
     }}
     .mono {{ font-family: 'IBM Plex Mono', monospace; }}
 
