@@ -322,31 +322,29 @@ def apply_theme_css(t: dict):
     .footer-card b {{ color: {t['text']}; font-weight: 600; }}
 
     /* ---------- Expander ---------- */
-    div[data-testid="stExpander"] {
+    div[data-testid="stExpander"] {{
         background: {t['surface']};
         border: 1px solid {t['border']};
         border-radius: 12px;
-    }
+    }}
     div[data-testid="stExpander"] summary,
     div[data-testid="stExpander"] summary *,
     div[data-testid="stExpander"] details summary,
     div[data-testid="stExpander"] details summary *,
     div[data-testid="stExpander"] [data-testid="stMarkdownContainer"] p,
     div[data-testid="stExpander"] span,
-    div[data-testid="stExpander"] label {
-        color: {t['text']} !important; /* บังคับให้ใช้สีข้อความหลัก (เข้ม/ชัดขึ้นทันที) */
+    div[data-testid="stExpander"] label {{
+        color: {t['text']} !important;
         font-weight: 500;
-    }
+    }}
     div[data-testid="stExpander"] summary:hover,
-    div[data-testid="stExpander"] summary:hover * 
-    s{
+    div[data-testid="stExpander"] summary:hover * {{
         color: {t['primary']} !important;
-    }
+    }}
 
     h1,h2,h3,h4,h5,h6 {{ color: {t['text']} !important; }}
     label,p,span,div {{ color: {t['text']}; }}
     .stDownloadButton button {{
-        background-color: {t['surface']} !important;
         color: {t['text']} !important;
         border: 1px solid {t['border']} !important;
         border-radius: 8px;
