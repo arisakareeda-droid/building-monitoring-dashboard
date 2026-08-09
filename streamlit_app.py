@@ -344,16 +344,11 @@ def apply_theme_css(t: dict):
 
     h1,h2,h3,h4,h5,h6 {{ color: {t['text']} !important; }}
     label,p,span,div {{ color: {t['text']}; }}
-    div.stDownloadButton > button {{
-        background-color: {t['btn_bg']} !important;
-        color: {t['btn_text']} !important;
-        border: 1px solid {t['btn_border']} !important;
-        border-radius: 8px !important;
-        font-weight: 500 !important;
-    }}
-    div.stDownloadButton > button:hover {{
-        border-color: {t['btn_hover_border']} !important;
-        color: {t['btn_hover_text']} !important;
+    .stDownloadButton button {{
+        color: {t['text']} !important;
+        border: 1px solid {t['border']} !important;
+        border-radius: 8px;
+        font-weight: 500;
     }}
 
     @media (max-width: 768px) {{
