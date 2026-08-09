@@ -369,8 +369,18 @@ def style_chart(fig, t: dict, height=380):
         plot_bgcolor=t["chart_bg"],
         paper_bgcolor=t["chart_bg"],
         font=dict(color=t["chart_font"], family="Kanit"),
-        xaxis=dict(showgrid=True, gridcolor=t["chart_grid"]),
-        yaxis=dict(showgrid=True, gridcolor=t["chart_grid"]),
+        xaxis=dict(
+            showgrid=True, 
+            gridcolor=t["chart_grid"],
+            title_font=dict(color=t["text"], size=13),     # ทำให้ชื่อแกน X ชัดขึ้น (สีเดียวกับข้อความปกติ)
+            tickfont=dict(color=t["subtitle"], size=11)   # ทำให้ตัวเลข/วันที่บนแกน X ชัดขึ้น
+        ),
+        yaxis=dict(
+            showgrid=True, 
+            gridcolor=t["chart_grid"],
+            title_font=dict(color=t["text"], size=13),     # ทำให้ชื่อแกน Y (เช่น จำนวนผู้อยู่อาศัย) ชัดขึ้น
+            tickfont=dict(color=t["subtitle"], size=11)   # ทำให้ตัวเลขสเกลแกน Y ชัดขึ้น
+        ),
         margin=dict(t=20, b=20, l=20, r=20),
         height=height,
     )
