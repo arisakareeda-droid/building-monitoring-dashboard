@@ -347,11 +347,11 @@ def apply_theme_css(t: dict):
     color: {t['text']} !important;
     font-weight: 500;
     }}
-    
+
     div[data-testid="stExpander"] summary:hover,
-    div[data-testid="stExpander"] summary:hover * {
-        color: {t['primary']} !important;
-    }
+    div[data-testid="stExpander"] summary:hover * {{
+    color: {t['primary']} !important;
+    }}
 
     h1,h2,h3,h4,h5,h6 {{ color: {t['text']} !important; }}
     label,p,span,div {{ color: {t['text']}; }}
