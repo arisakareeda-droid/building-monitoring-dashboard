@@ -336,21 +336,26 @@ def apply_theme_css(t: dict):
         border: 1px solid {t['border']};
         border-radius: 12px;
     }}
-    /* แก้ไขสีข้อความและหัวข้อใน Expander ให้อ่านง่ายเสมอ */
-    div[data-testid="stExpander"] summary,
+    /* แก้ไขสีข้อความและหัวข้อใน Expander ให้อ่านง่ายเสมอ (ครอบคลุมทั้ง DOM เก่า/ใหม่ของ Streamlit) */
+    div[data-testid="stExpander"] > details > summary,
+    div[data-testid="stExpander"] [data-testid="stExpanderHeader"],
+    div[data-testid="stExpander"] summary {{
+        background: {t['surface']} !important;
+        color: {t['text']} !important;
+        font-weight: 500;
+    }}
+    div[data-testid="stExpander"] > details > summary *,
+    div[data-testid="stExpander"] [data-testid="stExpanderHeader"] *,
     div[data-testid="stExpander"] summary *,
-    div[data-testid="stExpander"] details summary,
-    div[data-testid="stExpander"] details summary *,
     div[data-testid="stExpander"] [data-testid="stMarkdownContainer"] p,
     div[data-testid="stExpander"] span,
     div[data-testid="stExpander"] label {{
-    color: {t['text']} !important;
-    font-weight: 500;
+        color: {t['text']} !important;
     }}
 
     div[data-testid="stExpander"] summary:hover,
     div[data-testid="stExpander"] summary:hover * {{
-    color: {t['primary']} !important;
+        color: {t['primary']} !important;
     }}
 
     h1,h2,h3,h4,h5,h6 {{ color: {t['text']} !important; }}
@@ -385,16 +390,16 @@ def style_chart(fig, t: dict, height=380):
         paper_bgcolor=t["chart_bg"],
         font=dict(color=t["chart_font"], family="Kanit"),
         xaxis=dict(
-            showgrid=True, 
+            showgrid=True,
             gridcolor=t["chart_grid"],
-            title_font=dict(color=t["text"], size=13),     # ทำให้ชื่อแกน X ชัดขึ้น (สีเดียวกับข้อความปกติ)
-            tickfont=dict(color=t["subtitle"], size=11)   # ทำให้ตัวเลข/วันที่บนแกน X ชัดขึ้น
+            title_font=dict(color=t["text"], size=13),
+            tickfont=dict(color=t["subtitle"], size=11),
         ),
         yaxis=dict(
-            showgrid=True, 
+            showgrid=True,
             gridcolor=t["chart_grid"],
-            title_font=dict(color=t["text"], size=13),     # ทำให้ชื่อแกน Y (เช่น จำนวนผู้อยู่อาศัย) ชัดขึ้น
-            tickfont=dict(color=t["subtitle"], size=11)   # ทำให้ตัวเลขสเกลแกน Y ชัดขึ้น
+            title_font=dict(color=t["text"], size=13),
+            tickfont=dict(color=t["subtitle"], size=11),
         ),
         margin=dict(t=20, b=20, l=20, r=20),
         height=height,
@@ -428,12 +433,10 @@ def section_header(text: str) -> str:
 def load_data():
     df = pd.read_csv(SHEET_URL)
     df.columns = df.columns.str.strip()
-    
-    # === นำ 2 บรรทัดนี้ไปใส่เพิ่ม ===
+
     if "Date" in df.columns:
         df["Date"] = pd.to_datetime(df["Date"], errors="coerce").dt.strftime("%Y-%m-%d")
-    # ==========================
-    
+
     return df
 
 # ==================================================
