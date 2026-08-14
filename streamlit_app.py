@@ -343,10 +343,11 @@ def apply_theme_css(t: dict):
     div[data-testid="stExpander"] details summary *,
     div[data-testid="stExpander"] [data-testid="stMarkdownContainer"] p,
     div[data-testid="stExpander"] span,
-    div[data-testid="stExpander"] label {
-        color: {t['text']} !important;
-        font-weight: 500;
-    }
+    div[data-testid="stExpander"] label {{
+    color: {t['text']} !important;
+    font-weight: 500;
+    }}
+    
     div[data-testid="stExpander"] summary:hover,
     div[data-testid="stExpander"] summary:hover * {
         color: {t['primary']} !important;
