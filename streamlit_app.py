@@ -395,18 +395,7 @@ def apply_theme_css(t: dict):
         .kpi-value {{ font-size: 24px; }}
         .status-strip {{ font-size: 11px; gap: 14px; }}
     }}
-
-    /* ลดระยะห่างด้านบนของหน้าจอหลักทั้งหมดให้ขยับขึ้นไป */
-    .stMainBlockContainer, 
-    div[data-testid="stMain"] > div:first-child,
-    div[data-testid="block-container"] {
-        padding-top: 1.2rem !important;
-    }
     
-    /* ดึงส่วนหัว (Header) ให้ชิดด้านบนมากขึ้น */
-    header[data-testid="stHeader"] {
-        height: 0px !important;
-    }
     </style>
     """,
         unsafe_allow_html=True,
