@@ -154,7 +154,6 @@ def apply_theme_css(t: dict):
     button, input, select, textarea, a {{
         font-family: 'Kanit', sans-serif;
     }}
-    
     [data-testid*="Icon"],
     [class*="material-symbols"],
     [class*="material-icon"],
@@ -295,18 +294,21 @@ def apply_theme_css(t: dict):
     }}
     section[data-testid="stSidebar"] * {{ color: #EDF1F7 !important; }}
     
-    /* แก้ไขให้กล่องข้อความและตัวเลือกใน Sidebar แสดงผลตัวหนังสือชัดเจน */
+    /* บังคับสีตัวอักษรใน input และ selectbox ของ Sidebar ให้ชัดเจน */
     section[data-testid="stSidebar"] .stTextInput input,
     section[data-testid="stSidebar"] .stDateInput input,
-    section[data-testid="stSidebar"] div[data-testid*="stSelectbox"] div[data-baseweb="select"] span,
-    section[data-testid="stSidebar"] div[data-testid*="stSelectbox"] div[data-baseweb="select"] div {{
-        color: #fff !important;
+    section[data-testid="stSidebar"] div[data-baseweb="select"] span,
+    section[data-testid="stSidebar"] div[data-baseweb="select"] div,
+    section[data-testid="stSidebar"] input {{
+        color: #FFFFFF !important;
+        -webkit-text-fill-color: #FFFFFF !important;
     }}
+    
     section[data-testid="stSidebar"] .stTextInput input,
     section[data-testid="stSidebar"] .stDateInput input,
     section[data-testid="stSidebar"] div[data-baseweb="select"] > div {{
-        background-color: rgba(255,255,255,0.07);
-        border: 1px solid rgba(255,255,255,0.14);
+        background-color: rgba(255,255,255,0.08) !important;
+        border: 1px solid rgba(255,255,255,0.2) !important;
         border-radius: 7px;
     }}
 
