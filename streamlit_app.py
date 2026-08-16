@@ -292,22 +292,31 @@ def apply_theme_css(t: dict):
         background: {t['sidebar_grad']};
         border-right: 1px solid rgba(255,255,255,0.06);
     }}
-    section[data-testid="stSidebar"] * {{ color: #EDF1F7 !important; }}
     
-    /* บังคับสีตัวอักษรใน input และ selectbox ของ Sidebar ให้ชัดเจน */
+    /* ให้ข้อความทั่วไปใน Sidebar เป็นสีสว่าง แต่ยกเว้นกล่อง input/selectbox */
+    section[data-testid="stSidebar"] *:not(input):not(select):not(textarea):not([data-baseweb="select"] *) {{
+        color: #EDF1F7 !important;
+    }}
+    
+    /* จัดการสีตัวหนังสือและพื้นหลังในกล่อง input, selectbox, date_input ให้ชัดเจน */
     section[data-testid="stSidebar"] .stTextInput input,
     section[data-testid="stSidebar"] .stDateInput input,
     section[data-testid="stSidebar"] div[data-baseweb="select"] span,
     section[data-testid="stSidebar"] div[data-baseweb="select"] div,
     section[data-testid="stSidebar"] input {{
-        color: #FFFFFF !important;
-        -webkit-text-fill-color: #FFFFFF !important;
+        color: #101828 !important;
+        -webkit-text-fill-color: #101828 !important;
     }}
-    
+
+    section[data-testid="stSidebar"] input::placeholder {{
+        color: #667085 !important;
+        opacity: 1 !important;
+    }}
+
     section[data-testid="stSidebar"] .stTextInput input,
     section[data-testid="stSidebar"] .stDateInput input,
     section[data-testid="stSidebar"] div[data-baseweb="select"] > div {{
-        background-color: rgba(255,255,255,0.08) !important;
+        background-color: #FFFFFF !important;
         border: 1px solid rgba(255,255,255,0.2) !important;
         border-radius: 7px;
     }}
