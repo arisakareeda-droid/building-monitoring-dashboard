@@ -154,14 +154,13 @@ def apply_theme_css(t: dict):
     button, input, select, textarea, a {{
         font-family: 'Kanit', sans-serif;
     }}
-    /* กันไม่ให้ฟอนต์ Kanit ไปทับไอคอนของ Streamlit (Material Symbols)
-       ใช้ attribute-contains แทนชื่อ testid เป๊ะๆ เพราะแต่ละเวอร์ชัน Streamlit ตั้งชื่อไม่เหมือนกัน */
+    
     [data-testid*="Icon"],
     [class*="material-symbols"],
     [class*="material-icon"],
     span[class*="eyeicon"] {{
         font-family: 'Material Symbols Outlined', 'Material Symbols Rounded',
-                      'Material Icons', sans-serif !important;
+                     'Material Icons', sans-serif !important;
         font-feature-settings: 'liga' !important;
         -webkit-font-feature-settings: 'liga' !important;
     }}
@@ -184,7 +183,7 @@ def apply_theme_css(t: dict):
         margin-top: 2px;
     }}
 
-    /* ---------- Live status strip (signature element) ---------- */
+    /* ---------- Live status strip ---------- */
     .status-strip {{
         display: flex;
         align-items: center;
@@ -226,7 +225,7 @@ def apply_theme_css(t: dict):
         color: {t['text']};
     }}
 
-    /* ---------- KPI cards (hairline, flat — ไม่ใช้ glass) ---------- */
+    /* ---------- KPI cards ---------- */
     .kpi-card {{
         background: {t['surface']};
         border: 1px solid {t['border']};
@@ -275,7 +274,7 @@ def apply_theme_css(t: dict):
         padding: 16px;
     }}
 
-    /* ---------- Section headers: accent bar แทน emoji ---------- */
+    /* ---------- Section headers ---------- */
     .section-head {{
         display: flex; align-items: center; gap: 10px;
         margin: 6px 0 14px 0;
@@ -295,13 +294,22 @@ def apply_theme_css(t: dict):
         border-right: 1px solid rgba(255,255,255,0.06);
     }}
     section[data-testid="stSidebar"] * {{ color: #EDF1F7 !important; }}
+    
+    /* แก้ไขให้กล่องข้อความและตัวเลือกใน Sidebar แสดงผลตัวหนังสือชัดเจน */
     section[data-testid="stSidebar"] .stTextInput input,
-    section[data-testid="stSidebar"] .stDateInput input {{
-        background-color: rgba(255,255,255,0.07);
+    section[data-testid="stSidebar"] .stDateInput input,
+    section[data-testid="stSidebar"] div[data-testid*="stSelectbox"] div[data-baseweb="select"] span,
+    section[data-testid="stSidebar"] div[data-testid*="stSelectbox"] div[data-baseweb="select"] div {{
         color: #fff !important;
+    }}
+    section[data-testid="stSidebar"] .stTextInput input,
+    section[data-testid="stSidebar"] .stDateInput input,
+    section[data-testid="stSidebar"] div[data-baseweb="select"] > div {{
+        background-color: rgba(255,255,255,0.07);
         border: 1px solid rgba(255,255,255,0.14);
         border-radius: 7px;
     }}
+
     .sidebar-eyebrow {{
         font-size: 11px;
         text-transform: uppercase;
@@ -336,7 +344,6 @@ def apply_theme_css(t: dict):
         border: 1px solid {t['border']};
         border-radius: 12px;
     }}
-    /* แก้ไขสีข้อความและหัวข้อใน Expander ให้อ่านง่ายเสมอ (ครอบคลุมทั้ง DOM เก่า/ใหม่ของ Streamlit) */
     div[data-testid="stExpander"] > details > summary,
     div[data-testid="stExpander"] [data-testid="stExpanderHeader"],
     div[data-testid="stExpander"] summary {{
