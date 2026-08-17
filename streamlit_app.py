@@ -395,13 +395,6 @@ def apply_theme_css(t: dict):
         .kpi-value {{ font-size: 24px; }}
         .status-strip {{ font-size: 11px; gap: 14px; }}
     }}
-    
-    /* ปรับระยะห่างด้านบนของเนื้อหาหลักให้กระชับขึ้นอย่างปลอดภัย */
-    .block-container {
-        padding-top: 1.8rem !important;
-        padding-bottom: 2rem !important;
-    }
-    
     </style>
     """,
         unsafe_allow_html=True,
